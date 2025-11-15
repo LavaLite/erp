@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "yiire-core-api-v2",
-		"name": "Yiire Core API - Complete Collection",
-		"description": "**Comprehensive API collection for Yiire Multi-Organization ERP Core Microservice**\n\n## Features Covered:\n- 🔐 Authentication (JWT)\n- 👤 User Management\n- 🏢 Organizations\n- 🎭 Roles & Permissions\n- 👥 Teams\n- 📦 Modules\n- 💳 Billing\n- 🛡️ Security (2FA, Email Verification, Password Reset)\n\n## Base URL\n`http://localhost:8000/api`\n\n## Environment Variables Required:\n- `base_url` - API base URL\n- `jwt_token` - Auto-populated on login\n- `current_organization_id` - Auto-populated on login\n\n## Demo Credentials:\n- **Super Admin:** john@yiire.com | password\n- **Moderator:** jane@yiire.com | password\n- **User:** bob@yiire.com | password\n\n**Version:** 2.0.0  \n**Last Updated:** November 13, 2025",
+		"_postman_id": "lavalite-erp-api-v2",
+		"name": "Lavalite Core API - Complete Collection",
+		"description": "**Comprehensive API collection for Lavalite Multi-Organization ERP Core Microservice**\n\n## Features Covered:\n- 🔐 Authentication (JWT)\n- 👤 User Management\n- 🏢 Organizations\n- 🎭 Roles & Permissions\n- 👥 Teams\n- 📦 Modules\n- 💳 Billing\n- 🛡️ Security (2FA, Email Verification, Password Reset)\n\n## Base URL\n`http://localhost:8000/api`\n\n## Environment Variables Required:\n- `base_url` - API base URL\n- `jwt_token` - Auto-populated on login\n- `current_organization_id` - Auto-populated on login\n\n## Demo Credentials:\n- **Super Admin:** john@lavalite.org | password\n- **Moderator:** jane@lavalite.org | password\n- **User:** bob@lavalite.org | password\n\n**Version:** 2.0.0  \n**Last Updated:** November 13, 2025",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -78,7 +78,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"john@yiire.com\",\n  \"password\": \"password\",\n  \"organization_id\": \"acme\"\n}"
+							"raw": "{\n  \"email\": \"john@lavalite.org\",\n  \"password\": \"password\",\n  \"organization_id\": \"acme\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",

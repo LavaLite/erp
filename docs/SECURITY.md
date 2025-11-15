@@ -125,7 +125,7 @@ Subject: Verify Your Email Address
 
 Hi John,
 
-Welcome to Yiire! Please verify your email address by clicking the link below:
+Welcome to Lavalite! Please verify your email address by clicking the link below:
 
 [Verify Email Address]
 
@@ -134,7 +134,7 @@ This link will expire in 24 hours.
 If you didn't create this account, please ignore this email.
 
 Thanks,
-The Yiire Team
+The Lavalite Team
 ```
 
 ### Implementation Details
@@ -279,7 +279,7 @@ This link will expire in 1 hour.
 If you didn't request this, please ignore this email or contact support.
 
 Thanks,
-The Yiire Team
+The Lavalite Team
 ```
 
 ### Security Flow

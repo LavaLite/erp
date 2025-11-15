@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('Dashboard') }} - Yiire ERP</title>
+    <title>{{ __('Dashboard') }} - Lavalite ERP</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700&family=space-grotesk:500,600,700" rel="stylesheet" />
     
@@ -59,7 +59,7 @@
                         </svg>
                     </div>
                     <span class="text-xl font-display font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                        Yiire ERP
+                        Lavalite ERP
                     </span>
                 </a>
 
@@ -90,7 +90,7 @@
                 </div>
                 <div>
                     <h1 class="text-4xl font-display font-bold text-white mb-2">
-                        {{ __('Welcome to Yiire ERP!') }}
+                        {{ __('Welcome to Lavalite ERP!') }}
                     </h1>
                     <p class="text-lg text-slate-400">
                         {{ __('Get started by installing the plugin to unlock powerful features.') }}
@@ -109,7 +109,7 @@
                     <div class="ml-4">
                         <h3 class="text-sm font-semibold text-emerald-300 mb-1">{{ __('Successfully Logged In!') }}</h3>
                         <p class="text-sm text-slate-300">
-                            {{ __('Your account is active and ready to use. Follow the steps below to install and configure the Yiire ERP plugin.') }}
+                            {{ __('Your account is active and ready to use. Follow the steps below to install and configure the Lavalite ERP plugin.') }}
                         </p>
                     </div>
                 </div>
@@ -133,7 +133,7 @@
                     {{ __('Download Plugin') }}
                 </h3>
                 <p class="text-sm text-slate-400 mb-4">
-                    {{ __('Download the latest version of the Yiire ERP plugin package from our official repository.') }}
+                    {{ __('Download the latest version of the Lavalite ERP plugin package from our official repository.') }}
                 </p>
                 <button class="w-full px-4 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 rounded-lg text-white font-semibold shadow-lg shadow-violet-500/50 transition-all duration-200 transform hover:scale-105 flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,12 +162,12 @@
                 <div class="bg-slate-900/50 border border-white/10 rounded-lg p-4">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs font-medium text-slate-400">{{ __('Terminal') }}</span>
-                        <button onclick="copyToClipboard('composer require yiire/erp-plugin')" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">
+                        <button onclick="copyToClipboard('composer require lavalite/erp-plugin')" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">
                             {{ __('Copy') }}
                         </button>
                     </div>
                     <code class="text-sm text-emerald-400 font-mono">
-                        composer require yiire/erp-plugin
+                        composer require lavalite/erp-plugin
                     </code>
                 </div>
             </div>
@@ -192,12 +192,12 @@
                     <div class="bg-slate-900/50 border border-white/10 rounded-lg p-3">
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-xs font-medium text-slate-400">{{ __('Publish config') }}</span>
-                            <button onclick="copyToClipboard('php artisan vendor:publish --tag=yiire-config')" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">
+                            <button onclick="copyToClipboard('php artisan vendor:publish --tag=lavalite-config')" class="text-xs text-violet-400 hover:text-violet-300 transition-colors">
                                 {{ __('Copy') }}
                             </button>
                         </div>
                         <code class="text-xs text-emerald-400 font-mono break-all">
-                            php artisan vendor:publish --tag=yiire-config
+                            php artisan vendor:publish --tag=lavalite-config
                         </code>
                     </div>
                     <div class="bg-slate-900/50 border border-white/10 rounded-lg p-3">
@@ -233,7 +233,7 @@
                     </div>
                 </div>
                 <p class="text-sm text-slate-300 mb-4">
-                    {{ __('Access comprehensive documentation including API references, tutorials, and best practices for using Yiire ERP.') }}
+                    {{ __('Access comprehensive documentation including API references, tutorials, and best practices for using Lavalite ERP.') }}
                 </p>
                 <a href="/docs" class="inline-flex items-center text-sm font-medium text-violet-400 hover:text-violet-300 transition-colors">
                     {{ __('View Documentation') }}
@@ -276,7 +276,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div class="text-sm text-slate-400">
-                    © {{ date('Y') }} Yiire ERP. {{ __('All rights reserved.') }}
+                    © {{ date('Y') }} Lavalite ERP. {{ __('All rights reserved.') }}
                 </div>
                 <div class="flex items-center space-x-6">
                     <a href="#" class="text-sm text-slate-400 hover:text-violet-400 transition-colors">{{ __('Privacy') }}</a>

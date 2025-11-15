@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('Sign In') }} - Yiire ERP</title>
+    <title>{{ __('Sign In') }} - Lavalite ERP</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -59,7 +59,7 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-display font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                        Yiire ERP
+                        Lavalite ERP
                     </span>
                 </a>
                 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Yiire Laravel application includes a comprehensive Multi-Organization RBAC (Role-Based Access Control) system with the following features:
+The Lavalite Laravel application includes a comprehensive Multi-Organization RBAC (Role-Based Access Control) system with the following features:
 
 - **Organizations**: Multi-organization support with isolated data
 - **Roles**: Group permissions together (Admin, Moderator, User) - scoped per organization
@@ -513,4 +513,4 @@ php artisan db:seed --class=RolePermissionSeeder
 
 ## License
 
-This role and permission system is part of the Yiire project and follows the same MIT license.
+This role and permission system is part of the Lavalite project and follows the same MIT license.

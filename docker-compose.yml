@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: yiire-auth-app
+    container_name: lavalite-erp-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -14,15 +14,15 @@ services:
       - ./storage:/var/www/html/storage
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
     environment:
-      - APP_NAME=${APP_NAME:-Yiire Auth}
+      - APP_NAME=${APP_NAME:-Lavalite Auth}
       - APP_ENV=${APP_ENV:-production}
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${APP_URL:-http://localhost}
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-yiire_auth}
-      - DB_USERNAME=${DB_USERNAME:-yiire}
+      - DB_DATABASE=${DB_DATABASE:-lavalite_auth}
+      - DB_USERNAME=${DB_USERNAME:-lavalite}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
       - CACHE_DRIVER=${CACHE_DRIVER:-redis}
       - QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}
@@ -32,7 +32,7 @@ services:
     ports:
       - "${APP_PORT:-8000}:80"
     networks:
-      - yiire-network
+      - lavalite-network
     depends_on:
       - db
       - redis
@@ -40,11 +40,11 @@ services:
   # Database service (MySQL)
   db:
     image: mysql:8.0
-    container_name: yiire-auth-db
+    container_name: lavalite-erp-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-yiire_auth}
-      MYSQL_USER: ${DB_USERNAME:-yiire}
+      MYSQL_DATABASE: ${DB_DATABASE:-lavalite_auth}
+      MYSQL_USER: ${DB_USERNAME:-lavalite}
       MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
       MYSQL_ALLOW_EMPTY_PASSWORD: 'no'
@@ -54,7 +54,7 @@ services:
     ports:
       - "${DB_PORT:-3306}:3306"
     networks:
-      - yiire-network
+      - lavalite-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -64,14 +64,14 @@ services:
   # Redis service
   redis:
     image: redis:7-alpine
-    container_name: yiire-auth-redis
+    container_name: lavalite-erp-redis
     restart: unless-stopped
     volumes:
       - redis-data:/data
     ports:
       - "${REDIS_PORT:-6379}:6379"
     networks:
-      - yiire-network
+      - lavalite-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -81,22 +81,22 @@ services:
   # PostgreSQL (alternative to MySQL - optional)
   postgres:
     image: postgres:16-alpine
-    container_name: yiire-auth-postgres
+    container_name: lavalite-erp-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-yiire_auth}
-      POSTGRES_USER: ${DB_USERNAME:-yiire}
+      POSTGRES_DB: ${DB_DATABASE:-lavalite_auth}
+      POSTGRES_USER: ${DB_USERNAME:-lavalite}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     networks:
-      - yiire-network
+      - lavalite-network
     profiles:
       - postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-yiire}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-lavalite}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -106,7 +106,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: yiire-auth-queue
+    container_name: lavalite-erp-queue
     restart: unless-stopped
     command: php artisan queue:work --tries=3 --timeout=90
     working_dir: /var/www/html
@@ -118,7 +118,7 @@ services:
       - DB_HOST=db
       - REDIS_HOST=redis
     networks:
-      - yiire-network
+      - lavalite-network
     depends_on:
       - db
       - redis
@@ -130,7 +130,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: yiire-auth-scheduler
+    container_name: lavalite-erp-scheduler
     restart: unless-stopped
     command: sh -c "while [ true ]; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"
     working_dir: /var/www/html
@@ -141,14 +141,14 @@ services:
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
       - DB_HOST=db
     networks:
-      - yiire-network
+      - lavalite-network
     depends_on:
       - db
     profiles:
       - scheduler
 
 networks:
-  yiire-network:
+  lavalite-network:
     driver: bridge
 
 volumes:

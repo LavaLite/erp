@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Docker Push Script for Yiire Auth
+# Docker Push Script for Lavalite Auth
 # This script helps you build and push Docker images
 
 set -e
@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 VERSION="1.0.0"
 REGISTRY=${1:-"ghcr"}  # Default to GHCR, can pass "dockerhub" as argument
 
-echo -e "${GREEN}🐳 Yiire Auth - Docker Build & Push${NC}"
+echo -e "${GREEN}🐳 Lavalite Auth - Docker Build & Push${NC}"
 echo "========================================"
 
 # Check if Dockerfile exists
@@ -25,7 +25,7 @@ fi
 
 # Test build first
 echo -e "${YELLOW}Step 1: Building test image...${NC}"
-docker build -t yiire-auth-test .
+docker build -t lavalite-erp-test .
 
 if [ $? -ne 0 ]; then
     echo -e "${RED}Build failed!${NC}"
@@ -36,14 +36,14 @@ echo -e "${GREEN}✓ Build successful!${NC}"
 
 # Show image size
 echo -e "${YELLOW}Image size:${NC}"
-docker images yiire-auth-test | grep yiire-auth-test
+docker images lavalite-erp-test | grep lavalite-erp-test
 
 # Ask if user wants to continue
 read -p "Continue with push to registry? (y/n) " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Cancelled."
-    docker rmi yiire-auth-test
+    docker rmi lavalite-erp-test
     exit 0
 fi
 
@@ -62,19 +62,19 @@ if [ "$REGISTRY" == "ghcr" ]; then
     
     # Tag images
     echo "Tagging images..."
-    docker tag yiire-auth-test ghcr.io/yiire-erp/auth:$VERSION
-    docker tag yiire-auth-test ghcr.io/yiire-erp/auth:latest
+    docker tag lavalite-erp-test ghcr.io/lavalite/erp:$VERSION
+    docker tag lavalite-erp-test ghcr.io/lavalite/erp:latest
     
     # Push images
     echo "Pushing version $VERSION..."
-    docker push ghcr.io/yiire-erp/auth:$VERSION
+    docker push ghcr.io/lavalite/erp:$VERSION
     
     echo "Pushing latest..."
-    docker push ghcr.io/yiire-erp/auth:latest
+    docker push ghcr.io/lavalite/erp:latest
     
     echo -e "${GREEN}✓ Successfully pushed to GHCR!${NC}"
-    echo "Image: ghcr.io/yiire-erp/auth:$VERSION"
-    echo "Image: ghcr.io/yiire-erp/auth:latest"
+    echo "Image: ghcr.io/lavalite/erp:$VERSION"
+    echo "Image: ghcr.io/lavalite/erp:latest"
     
 elif [ "$REGISTRY" == "dockerhub" ]; then
     echo -e "${YELLOW}Step 2: Pushing to Docker Hub...${NC}"
@@ -88,19 +88,19 @@ elif [ "$REGISTRY" == "dockerhub" ]; then
     
     # Tag images
     echo "Tagging images..."
-    docker tag yiire-auth-test yiire/auth:$VERSION
-    docker tag yiire-auth-test yiire/auth:latest
+    docker tag lavalite-erp-test lavalite/auth:$VERSION
+    docker tag lavalite-erp-test lavalite/auth:latest
     
     # Push images
     echo "Pushing version $VERSION..."
-    docker push yiire/auth:$VERSION
+    docker push lavalite/auth:$VERSION
     
     echo "Pushing latest..."
-    docker push yiire/auth:latest
+    docker push lavalite/auth:latest
     
     echo -e "${GREEN}✓ Successfully pushed to Docker Hub!${NC}"
-    echo "Image: yiire/auth:$VERSION"
-    echo "Image: yiire/auth:latest"
+    echo "Image: lavalite/auth:$VERSION"
+    echo "Image: lavalite/auth:latest"
     
 else
     echo -e "${RED}Unknown registry: $REGISTRY${NC}"
@@ -110,6 +110,6 @@ fi
 
 # Cleanup test image
 echo "Cleaning up test image..."
-docker rmi yiire-auth-test
+docker rmi lavalite-erp-test
 
 echo -e "${GREEN}✓ All done!${NC}"

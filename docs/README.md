@@ -1,6 +1,6 @@
 # Documentation Index
 
-> **Complete documentation for Yiire Multi-Organization ERP Core Microservice**
+> **Complete documentation for Lavalite Multi-Organization ERP Core Microservice**
 
 Welcome to the comprehensive documentation for the authentication and authorization microservice. All documentation has been consolidated into single-source guides for each feature area.
 
@@ -285,10 +285,10 @@ All consolidated documentation follows these standards:
 
 ## 🆘 Getting Help
 
-- **📧 Email:** support@yiire.com
-- **🐛 Issues:** https://github.com/yiire-erp/auth/issues
-- **💬 Discussions:** https://github.com/yiire-erp/auth/discussions
-- **📖 Docs:** https://docs.yiire.com
+- **📧 Email:** support@lavalite.org
+- **🐛 Issues:** https://github.com/lavalite/erp/issues
+- **💬 Discussions:** https://github.com/lavalite/erp/discussions
+- **📖 Docs:** https://docs.lavalite.org
 
 ---
 

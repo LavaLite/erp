@@ -1,4 +1,4 @@
-# Yiire Core - Multi-Organization ERP Core Microservice
+# Lavalite Core - Multi-Organization ERP Core Microservice
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
@@ -41,7 +41,7 @@ A production-ready Laravel-based multi-organization ERP core microservice with J
 
 ```bash
 # Clone the repository
-git clone https://github.com/yiireerp/core.git
+git clone https://github.com/lavaliteerp/core.git
 cd core
 
 # Install dependencies
@@ -65,7 +65,7 @@ Visit `http://localhost:8000` and use the [demo credentials](#-demo-credentials)
 
 ```bash
 # Clone the repository
-git clone https://github.com/yiireerp/core.git
+git clone https://github.com/lavaliteerp/core.git
 cd core
 
 # Copy environment file
@@ -111,7 +111,7 @@ Application will be available at `http://localhost:8000`
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
    DB_PORT=3306
-   DB_DATABASE=yiire_core
+   DB_DATABASE=lavalite_core
    DB_USERNAME=your_username
    DB_PASSWORD=your_password
    ```
@@ -202,11 +202,11 @@ For production, use the optimized Dockerfile:
 
 ```bash
 # Build production image
-docker build -t yiire/core:latest .
+docker build -t lavalite/erp:latest .
 
 # Run container
 docker run -d \
-  --name yiire-core \
+  --name lavalite-erp \
   -p 80:80 \
   -e APP_ENV=production \
   -e APP_DEBUG=false \
@@ -214,7 +214,7 @@ docker run -d \
   -e DB_DATABASE=your-db-name \
   -e DB_USERNAME=your-db-user \
   -e DB_PASSWORD=your-db-password \
-  yiire/core:latest
+  lavalite/erp:latest
 ```
 
 ## 📚 API Documentation
@@ -302,11 +302,11 @@ After seeding the database, you can use these credentials:
 
 | Email | Password | Organizations | Role |
 |-------|----------|---------|------|
-| globaladmin@yiire.com | password | Acme (Admin), TechStart (Admin) | Global Admin |
-| superadmin@yiire.com | password | Acme (Super Admin), TechStart (Super Admin) | Super Admin |
-| useradmin@yiire.com | password | Acme (User Admin), TechStart (User Admin) | User Admin |
-| user@yiire.com | password | Acme (User), TechStart (User) | User |
-| client@yiire.com | password | Acme (Client), TechStart (Client) | Client |
+| globaladmin@lavalite.org | password | Acme (Admin), TechStart (Admin) | Global Admin |
+| superadmin@lavalite.org | password | Acme (Super Admin), TechStart (Super Admin) | Super Admin |
+| useradmin@lavalite.org | password | Acme (User Admin), TechStart (User Admin) | User Admin |
+| user@lavalite.org | password | Acme (User), TechStart (User) | User |
+| client@lavalite.org | password | Acme (Client), TechStart (Client) | Client |
 
 ### Example Login Request
 
@@ -314,7 +314,7 @@ After seeding the database, you can use these credentials:
 curl -X POST http://localhost:8000/api/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "globaladmin@yiire.com",
+    "email": "globaladmin@lavalite.org",
     "password": "password"
   }'
 ```
@@ -380,13 +380,13 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## 📧 Support
 
-- **Issues:** [GitHub Issues](https://github.com/yiireerp/core/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yiireerp/core/discussions)
-- **Email:** team@yiire.com
+- **Issues:** [GitHub Issues](https://github.com/lavaliteerp/core/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/lavaliteerp/core/discussions)
+- **Email:** team@lavalite.org
 
 ---
 
-<p align="center">Made with ❤️ by the Yiire Team</p>
+<p align="center">Made with ❤️ by the Lavalite Team</p>
 <p align="center">
-  <a href="https://github.com/yiireerp/core">⭐ Star us on GitHub</a>
+  <a href="https://github.com/lavaliteerp/core">⭐ Star us on GitHub</a>
 </p>

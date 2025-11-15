@@ -1,4 +1,4 @@
-# Yiire - Laravel Sanctum Authentication API
+# Lavalite - Laravel Sanctum Authentication API
 
 This project is a Laravel application with Laravel Sanctum authentication configured.
 
@@ -21,7 +21,7 @@ This project is a Laravel application with Laravel Sanctum authentication config
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
    DB_PORT=3306
-   DB_DATABASE=yiire
+   DB_DATABASE=lavalite
    DB_USERNAME=root
    DB_PASSWORD=
    ```

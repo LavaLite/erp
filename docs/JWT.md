@@ -20,7 +20,7 @@
 
 ## Overview
 
-The Yiire multi-organization authentication microservice uses JWT (JSON Web Tokens) for stateless authentication. JWTs embed user identity, roles, permissions, modules, and organization context, enabling **zero-query validation** across distributed microservices.
+The Lavalite multi-organization authentication microservice uses JWT (JSON Web Tokens) for stateless authentication. JWTs embed user identity, roles, permissions, modules, and organization context, enabling **zero-query validation** across distributed microservices.
 
 ### Key Benefits
 
@@ -39,7 +39,7 @@ The Yiire multi-organization authentication microservice uses JWT (JSON Web Toke
 
 ```json
 {
-  "iss": "https://api.yiire.com",           // Issuer
+  "iss": "https://api.lavalite.org",           // Issuer
   "sub": 1,                                  // Subject (User ID)
   "iat": 1699876543,                         // Issued at (timestamp)
   "exp": 1699880143,                         // Expiration (timestamp)

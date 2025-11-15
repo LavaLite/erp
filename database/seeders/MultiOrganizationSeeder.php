@@ -145,7 +145,7 @@ class MultiOrganizationSeeder extends Seeder
         $globalAdmin = User::create([
             'first_name' => 'Global',
             'last_name' => 'Admin',
-            'email' => 'globaladmin@yiire.com',
+            'email' => 'globaladmin@lavalite.org',
             'password' => Hash::make('password'),
             'phone' => '+1-555-0101',
             'date_of_birth' => '1985-06-20',
@@ -162,7 +162,7 @@ class MultiOrganizationSeeder extends Seeder
         $superAdmin = User::create([
             'first_name' => 'Super',
             'last_name' => 'Admin',
-            'email' => 'superadmin@yiire.com',
+            'email' => 'superadmin@lavalite.org',
             'password' => Hash::make('password'),
             'phone' => '+1-555-0103',
             'date_of_birth' => '1990-05-15',
@@ -179,7 +179,7 @@ class MultiOrganizationSeeder extends Seeder
         $userAdmin = User::create([
             'first_name' => 'User',
             'last_name' => 'Admin',
-            'email' => 'useradmin@yiire.com',
+            'email' => 'useradmin@lavalite.org',
             'password' => Hash::make('password'),
             'phone' => '+1-555-0102',
             'date_of_birth' => '1987-09-15',
@@ -196,7 +196,7 @@ class MultiOrganizationSeeder extends Seeder
         $user = User::create([
             'first_name' => 'Regular',
             'last_name' => 'User',
-            'email' => 'user@yiire.com',
+            'email' => 'user@lavalite.org',
             'password' => Hash::make('password'),
             'phone' => '+1-555-0104',
             'date_of_birth' => '1992-08-22',
@@ -213,7 +213,7 @@ class MultiOrganizationSeeder extends Seeder
         $client = User::create([
             'first_name' => 'Client',
             'last_name' => 'User',
-            'email' => 'client@yiire.com',
+            'email' => 'client@lavalite.org',
             'password' => Hash::make('password'),
             'phone' => '+1-555-0105',
             'date_of_birth' => '1988-03-10',
@@ -281,11 +281,11 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('2. TechStart Inc (slug: techstart)');
         $this->command->info('');
         $this->command->info('Users created:');
-        $this->command->info('- globaladmin@yiire.com (GLOBAL ADMIN - admin role in both organizations, can manage global roles/permissions)');
-        $this->command->info('- useradmin@yiire.com (USER ADMIN - user-admin role in both organizations, can manage users)');
-        $this->command->info('- superadmin@yiire.com (SUPER ADMIN - superadmin role in both organizations)');
-        $this->command->info('- user@yiire.com (USER - user role in both organizations)');
-        $this->command->info('- client@yiire.com (CLIENT - client role in both organizations)');
+        $this->command->info('- globaladmin@lavalite.org (GLOBAL ADMIN - admin role in both organizations, can manage global roles/permissions)');
+        $this->command->info('- useradmin@lavalite.org (USER ADMIN - user-admin role in both organizations, can manage users)');
+        $this->command->info('- superadmin@lavalite.org (SUPER ADMIN - superadmin role in both organizations)');
+        $this->command->info('- user@lavalite.org (USER - user role in both organizations)');
+        $this->command->info('- client@lavalite.org (CLIENT - client role in both organizations)');
         $this->command->info('');
         $this->command->info('Password for all users: password');
     }

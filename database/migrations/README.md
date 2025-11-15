@@ -203,4 +203,4 @@ php artisan migrate:status
 
 For questions about migrations:
 - See: `/docs/GETTING_STARTED.md`
-- Email: team@yiire.com
+- Email: team@lavalite.org

@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Yiire Auth Microservice
+# Multi-stage Dockerfile for Lavalite Auth Microservice
 
 # Stage 1: Composer dependencies
 FROM composer:2.7 AS composer
@@ -19,7 +19,7 @@ RUN composer dump-autoload --optimize --no-dev
 # Stage 2: Production image
 FROM php:8.2-fpm-alpine
 
-LABEL maintainer="Yiire Team <team@yiire.com>"
+LABEL maintainer="Lavalite Team <team@lavalite.org>"
 LABEL description="Multi-tenant authorization microservice with JWT authentication"
 
 # Install system dependencies

@@ -1,6 +1,6 @@
-# Contributing to Yiire Auth
+# Contributing to Lavalite Auth
 
-Thank you for your interest in contributing to Yiire Auth! We welcome contributions from the community.
+Thank you for your interest in contributing to Lavalite Auth! We welcome contributions from the community.
 
 ## Table of Contents
 
@@ -62,7 +62,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ```bash
 # Clone the repository
-git clone https://github.com/yiire-erp/auth.git
+git clone https://github.com/lavalite/erp.git
 cd auth
 
 # Install PHP dependencies
@@ -204,4 +204,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to Yiire Auth! 🎉
+Thank you for contributing to Lavalite Auth! 🎉

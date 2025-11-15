@@ -194,7 +194,7 @@ For existing deployments:
   - `getAllPermissionsInOrganization()`: Returns both organization-specific and global
 
 #### Seeders
-- **DatabaseSeeder**: Added super admin user creation (`superadmin@yiire.com`)
+- **DatabaseSeeder**: Added super admin user creation (`superadmin@lavalite.org`)
 
 #### Documentation
 - **NEW**: `docs/GLOBAL_ROLES_PERMISSIONS.md` - Comprehensive 9-section guide
@@ -228,7 +228,7 @@ For existing deployments:
 ## [1.0.0] - 2025-11-12
 
 ### Added
-- Initial release of Yiire Auth microservice
+- Initial release of Lavalite Auth microservice
 - Multi-organization authorization architecture with UUID organization IDs
 - JWT authentication with tymon/jwt-auth
 - Complete RBAC (Role-Based Access Control) system
@@ -334,7 +334,7 @@ For existing deployments:
 
 ### Version 1.0.0 - Initial Release
 
-This is the first stable release of Yiire Auth, a production-ready multi-organization authorization microservice. The system provides:
+This is the first stable release of Lavalite Auth, a production-ready multi-organization authorization microservice. The system provides:
 
 **Core Features:**
 - Multi-organization architecture where users can belong to multiple organizations
@@ -358,5 +358,5 @@ This is the first stable release of Yiire Auth, a production-ready multi-organiz
 For installation instructions, see [README.md](README.md).
 For API documentation, see [docs/API_REFERENCE.md](docs/API_REFERENCE.md).
 
-[Unreleased]: https://github.com/yiire-erp/auth/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/yiire-erp/auth/releases/tag/v1.0.0
+[Unreleased]: https://github.com/lavalite/erp/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/lavalite/erp/releases/tag/v1.0.0

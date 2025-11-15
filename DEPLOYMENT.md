@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers various deployment options for Yiire Auth microservice.
+This guide covers various deployment options for Lavalite Auth microservice.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This guide covers various deployment options for Yiire Auth microservice.
 
 1. **Clone and configure**
    ```bash
-   git clone https://github.com/yiire-erp/auth.git
+   git clone https://github.com/lavalite/erp.git
    cd auth
    cp .env.docker .env
    ```
@@ -54,30 +54,30 @@ For production, use the optimized Dockerfile with environment-specific settings:
 
 ```bash
 # Build production image
-docker build -t yiire/auth:1.0.0 .
+docker build -t lavalite/auth:1.0.0 .
 
 # Tag as latest
-docker tag yiire/auth:1.0.0 yiire/auth:latest
+docker tag lavalite/auth:1.0.0 lavalite/auth:latest
 
 # Push to registry (GitHub Container Registry example)
-docker push ghcr.io/yiire-erp/auth:1.0.0
-docker push ghcr.io/yiire-erp/auth:latest
+docker push ghcr.io/lavalite/erp:1.0.0
+docker push ghcr.io/lavalite/erp:latest
 
 # Run in production
 docker run -d \
-  --name yiire-auth \
+  --name lavalite-erp \
   --restart unless-stopped \
   -p 80:80 \
   -e APP_ENV=production \
   -e APP_DEBUG=false \
   -e APP_KEY=base64:YOUR_APP_KEY \
   -e DB_HOST=your-db-host \
-  -e DB_DATABASE=yiire_auth \
-  -e DB_USERNAME=yiire \
+  -e DB_DATABASE=lavalite_auth \
+  -e DB_USERNAME=lavalite \
   -e DB_PASSWORD=your-secure-password \
   -e JWT_SECRET=your-jwt-secret \
   -e REDIS_HOST=your-redis-host \
-  ghcr.io/yiire-erp/auth:latest
+  ghcr.io/lavalite/erp:latest
 ```
 
 ### Docker Compose for Production
@@ -89,7 +89,7 @@ version: '3.8'
 
 services:
   app:
-    image: ghcr.io/yiire-erp/auth:latest
+    image: ghcr.io/lavalite/erp:latest
     restart: unless-stopped
     environment:
       - APP_ENV=production
@@ -101,7 +101,7 @@ services:
     ports:
       - "80:80"
     networks:
-      - yiire-network
+      - lavalite-network
     depends_on:
       - db
       - redis
@@ -117,7 +117,7 @@ services:
     volumes:
       - db-data:/var/lib/mysql
     networks:
-      - yiire-network
+      - lavalite-network
 
   redis:
     image: redis:7-alpine
@@ -125,10 +125,10 @@ services:
     volumes:
       - redis-data:/data
     networks:
-      - yiire-network
+      - lavalite-network
 
 networks:
-  yiire-network:
+  lavalite-network:
     driver: bridge
 
 volumes:
@@ -189,13 +189,13 @@ sudo apt install -y supervisor
 cd /var/www
 
 # Clone repository
-sudo git clone https://github.com/yiire-erp/auth.git yiire-auth
-cd yiire-auth
+sudo git clone https://github.com/lavalite/erp.git lavalite-erp
+cd lavalite-erp
 
 # Set permissions
-sudo chown -R www-data:www-data /var/www/yiire-auth
-sudo chmod -R 755 /var/www/yiire-auth/storage
-sudo chmod -R 755 /var/www/yiire-auth/bootstrap/cache
+sudo chown -R www-data:www-data /var/www/lavalite-erp
+sudo chmod -R 755 /var/www/lavalite-erp/storage
+sudo chmod -R 755 /var/www/lavalite-erp/bootstrap/cache
 
 # Install dependencies
 sudo -u www-data composer install --no-dev --optimize-autoloader
@@ -212,9 +212,9 @@ sudo -u www-data php artisan jwt:secret
 # Create database
 mysql -u root -p
 
-CREATE DATABASE yiire_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'yiire'@'localhost' IDENTIFIED BY 'secure_password';
-GRANT ALL PRIVILEGES ON yiire_auth.* TO 'yiire'@'localhost';
+CREATE DATABASE lavalite_auth CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'lavalite'@'localhost' IDENTIFIED BY 'secure_password';
+GRANT ALL PRIVILEGES ON lavalite_auth.* TO 'lavalite'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 
@@ -222,8 +222,8 @@ EXIT;
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=yiire_auth
-DB_USERNAME=yiire
+DB_DATABASE=lavalite_auth
+DB_USERNAME=lavalite
 DB_PASSWORD=secure_password
 
 # Run migrations
@@ -232,13 +232,13 @@ sudo -u www-data php artisan migrate --force
 
 ### Step 4: Configure Nginx
 
-Create `/etc/nginx/sites-available/yiire-auth`:
+Create `/etc/nginx/sites-available/lavalite-erp`:
 
 ```nginx
 server {
     listen 80;
     server_name auth.yourdomain.com;
-    root /var/www/yiire-auth/public;
+    root /var/www/lavalite-erp/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-Content-Type-Options "nosniff";
@@ -270,19 +270,19 @@ server {
 
 Enable site:
 ```bash
-sudo ln -s /etc/nginx/sites-available/yiire-auth /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/lavalite-erp /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
 ### Step 5: Configure Supervisor (Queue Workers)
 
-Create `/etc/supervisor/conf.d/yiire-auth-worker.conf`:
+Create `/etc/supervisor/conf.d/lavalite-erp-worker.conf`:
 
 ```ini
-[program:yiire-auth-worker]
+[program:lavalite-erp-worker]
 process_name=%(program_name)s_%(process_num)02d
-command=php /var/www/yiire-auth/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+command=php /var/www/lavalite-erp/artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
 autostart=true
 autorestart=true
 stopasgroup=true
@@ -290,7 +290,7 @@ killasgroup=true
 user=www-data
 numprocs=2
 redirect_stderr=true
-stdout_logfile=/var/www/yiire-auth/storage/logs/worker.log
+stdout_logfile=/var/www/lavalite-erp/storage/logs/worker.log
 stopwaitsecs=3600
 ```
 
@@ -298,7 +298,7 @@ Start workers:
 ```bash
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl start yiire-auth-worker:*
+sudo supervisorctl start lavalite-erp-worker:*
 ```
 
 ### Step 6: Setup SSL with Let's Encrypt
@@ -330,8 +330,8 @@ sudo certbot --nginx -d auth.yourdomain.com
 
 ```bash
 # Deploy using Cloud Run
-gcloud run deploy yiire-auth \
-  --image ghcr.io/yiire-erp/auth:latest \
+gcloud run deploy lavalite-erp \
+  --image ghcr.io/lavalite/erp:latest \
   --platform managed \
   --region us-central1 \
   --allow-unauthenticated \
@@ -354,20 +354,20 @@ Create `k8s/deployment.yaml`:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: yiire-auth
+  name: lavalite-erp
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: yiire-auth
+      app: lavalite-erp
   template:
     metadata:
       labels:
-        app: yiire-auth
+        app: lavalite-erp
     spec:
       containers:
-      - name: yiire-auth
-        image: ghcr.io/yiire-erp/auth:latest
+      - name: lavalite-erp
+        image: ghcr.io/lavalite/erp:latest
         ports:
         - containerPort: 80
         env:
@@ -376,20 +376,20 @@ spec:
         - name: DB_HOST
           valueFrom:
             secretKeyRef:
-              name: yiire-auth-secrets
+              name: lavalite-erp-secrets
               key: db-host
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: yiire-auth-service
+  name: lavalite-erp-service
 spec:
   type: LoadBalancer
   ports:
   - port: 80
     targetPort: 80
   selector:
-    app: yiire-auth
+    app: lavalite-erp
 ```
 
 Deploy:
@@ -452,7 +452,7 @@ kubectl apply -f k8s/deployment.yaml
 ### Required Variables
 
 ```env
-APP_NAME=Yiire Auth
+APP_NAME=Lavalite Auth
 APP_ENV=production
 APP_KEY=base64:generated_key
 APP_DEBUG=false
@@ -461,8 +461,8 @@ APP_URL=https://auth.yourdomain.com
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=yiire_auth
-DB_USERNAME=yiire
+DB_DATABASE=lavalite_auth
+DB_USERNAME=lavalite
 DB_PASSWORD=secure_password
 
 JWT_SECRET=your_jwt_secret
@@ -497,7 +497,7 @@ sudo chmod -R 755 storage bootstrap/cache
 
 **Queue not processing:**
 ```bash
-sudo supervisorctl restart yiire-auth-worker:*
+sudo supervisorctl restart lavalite-erp-worker:*
 ```
 
 **Database connection errors:**
@@ -516,5 +516,5 @@ php artisan view:clear
 ## Support
 
 For deployment assistance:
-- GitHub Issues: https://github.com/yiire-erp/auth/issues
-- Email: team@yiire.com
+- GitHub Issues: https://github.com/lavalite/erp/issues
+- Email: team@lavalite.org

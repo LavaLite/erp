@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Yiire Auth system supports both **organization-scoped** and **global** roles and permissions. Global roles and permissions have a `organization_id` of `null` and can be accessed across all organizations.
+The Lavalite Auth system supports both **organization-scoped** and **global** roles and permissions. Global roles and permissions have a `organization_id` of `null` and can be accessed across all organizations.
 
 ## Key Concepts
 

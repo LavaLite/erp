@@ -481,4 +481,4 @@ $organization->updateUserLimit(100);
 For questions or issues with billing integration, please refer to:
 - Main Documentation: `/docs`
 - API Reference: `/docs/API_REFERENCE.md`
-- Contact: team@yiire.com
+- Contact: team@lavalite.org

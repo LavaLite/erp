@@ -1,8 +1,8 @@
-# Yiire ERP - New Microservice Skeleton Creation Guide
+# Lavalite ERP - New Microservice Skeleton Creation Guide
 
 **Version:** 1.0  
 **Last Updated:** November 14, 2025  
-**Based on:** Yiire Core Auth Microservice (Laravel 12.x)
+**Based on:** Lavalite Core Auth Microservice (Laravel 12.x)
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 📖 Overview
 
-This guide helps you create a new microservice following the same patterns, structure, and conventions as the **Yiire Core Authentication Microservice**.
+This guide helps you create a new microservice following the same patterns, structure, and conventions as the **Lavalite Core Authentication Microservice**.
 
 ### What You'll Build
 
@@ -64,8 +64,8 @@ git --version
 
 ```bash
 # 1. Create new Laravel project
-composer create-project laravel/laravel yiire-[SERVICE-NAME] "12.*"
-cd yiire-[SERVICE-NAME]
+composer create-project laravel/laravel lavalite-[SERVICE-NAME] "12.*"
+cd lavalite-[SERVICE-NAME]
 
 # 2. Install required packages
 composer require tymon/jwt-auth:^2.2
@@ -100,16 +100,16 @@ php artisan serve
 
 ```bash
 # Replace [SERVICE-NAME] with your microservice name (e.g., inventory, crm, accounting)
-composer create-project laravel/laravel yiire-[SERVICE-NAME] "12.*"
-cd yiire-[SERVICE-NAME]
+composer create-project laravel/laravel lavalite-[SERVICE-NAME] "12.*"
+cd lavalite-[SERVICE-NAME]
 ```
 
 **Example microservice names:**
-- `yiire-inventory` - Inventory management
-- `yiire-crm` - Customer relationship management
-- `yiire-accounting` - Accounting and finance
-- `yiire-hrm` - Human resources management
-- `yiire-pos` - Point of sale
+- `lavalite-inventory` - Inventory management
+- `lavalite-crm` - Customer relationship management
+- `lavalite-accounting` - Accounting and finance
+- `lavalite-hrm` - Human resources management
+- `lavalite-pos` - Point of sale
 
 ---
 
@@ -137,8 +137,8 @@ composer require guzzlehttp/guzzle:^7.8
 #### 3.1 Copy JWT Configuration
 
 ```bash
-# From yiire/core directory
-cp /Volumes/Works/yiire/core/config/jwt.php config/jwt.php
+# From lavalite/erp directory
+cp lavalite/erp/config/jwt.php config/jwt.php
 ```
 
 #### 3.2 Update `config/auth.php`
@@ -667,7 +667,7 @@ return new class extends Migration
 **File: `.env.example`**
 
 ```bash
-APP_NAME="Yiire [SERVICE-NAME]"
+APP_NAME="Lavalite [SERVICE-NAME]"
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true
@@ -688,7 +688,7 @@ DB_CONNECTION=sqlite
 # DB_CONNECTION=mysql
 # DB_HOST=127.0.0.1
 # DB_PORT=3306
-# DB_DATABASE=yiire_[service]
+# DB_DATABASE=lavalite_[service]
 # DB_USERNAME=root
 # DB_PASSWORD=
 
@@ -710,7 +710,7 @@ AUTH_SERVICE_API_KEY=
 
 # Mail
 MAIL_MAILER=log
-MAIL_FROM_ADDRESS="noreply@yiire.com"
+MAIL_FROM_ADDRESS="noreply@lavalite.org"
 MAIL_FROM_NAME="${APP_NAME}"
 
 # Redis (Optional)
@@ -728,7 +728,7 @@ REDIS_PORT=6379
 **File: `Dockerfile`**
 
 ```dockerfile
-# Multi-stage Dockerfile for Yiire [SERVICE-NAME] Microservice
+# Multi-stage Dockerfile for Lavalite [SERVICE-NAME] Microservice
 
 # Stage 1: Composer dependencies
 FROM composer:2.7 AS composer
@@ -749,8 +749,8 @@ RUN composer dump-autoload --optimize --no-dev
 # Stage 2: Production image
 FROM php:8.2-fpm-alpine
 
-LABEL maintainer="Yiire Team <team@yiire.com>"
-LABEL description="[SERVICE-NAME] microservice for Yiire ERP"
+LABEL maintainer="Lavalite Team <team@lavalite.org>"
+LABEL description="[SERVICE-NAME] microservice for Lavalite ERP"
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -822,7 +822,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: yiire-[service]-app
+    container_name: lavalite-[service]-app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -830,15 +830,15 @@ services:
       - ./storage:/var/www/html/storage
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
     environment:
-      - APP_NAME=${APP_NAME:-Yiire [SERVICE]}
+      - APP_NAME=${APP_NAME:-Lavalite [SERVICE]}
       - APP_ENV=${APP_ENV:-production}
       - APP_DEBUG=${APP_DEBUG:-false}
       - APP_URL=${APP_URL:-http://localhost}
       - DB_CONNECTION=${DB_CONNECTION:-mysql}
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_DATABASE=${DB_DATABASE:-yiire_[service]}
-      - DB_USERNAME=${DB_USERNAME:-yiire}
+      - DB_DATABASE=${DB_DATABASE:-lavalite_[service]}
+      - DB_USERNAME=${DB_USERNAME:-lavalite}
       - DB_PASSWORD=${DB_PASSWORD:-secret}
       - CACHE_DRIVER=${CACHE_DRIVER:-redis}
       - QUEUE_CONNECTION=${QUEUE_CONNECTION:-redis}
@@ -848,7 +848,7 @@ services:
     ports:
       - "${APP_PORT:-8001}:80"
     networks:
-      - yiire-network
+      - lavalite-network
     depends_on:
       - db
       - redis
@@ -856,11 +856,11 @@ services:
   # Database service (MySQL)
   db:
     image: mysql:8.0
-    container_name: yiire-[service]-db
+    container_name: lavalite-[service]-db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-yiire_[service]}
-      MYSQL_USER: ${DB_USERNAME:-yiire}
+      MYSQL_DATABASE: ${DB_DATABASE:-lavalite_[service]}
+      MYSQL_USER: ${DB_USERNAME:-lavalite}
       MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret}
     volumes:
@@ -868,22 +868,22 @@ services:
     ports:
       - "${DB_PORT:-3307}:3306"
     networks:
-      - yiire-network
+      - lavalite-network
 
   # Redis service
   redis:
     image: redis:7-alpine
-    container_name: yiire-[service]-redis
+    container_name: lavalite-[service]-redis
     restart: unless-stopped
     volumes:
       - redis-data:/data
     ports:
       - "${REDIS_PORT:-6380}:6379"
     networks:
-      - yiire-network
+      - lavalite-network
 
 networks:
-  yiire-network:
+  lavalite-network:
     driver: bridge
 
 volumes:
@@ -1029,13 +1029,13 @@ stdout_logfile=/var/log/nginx.out.log
 **File: `README.md`**
 
 ```markdown
-# Yiire [SERVICE-NAME] - Microservice
+# Lavalite [SERVICE-NAME] - Microservice
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Laravel](https://img.shields.io/badge/Laravel-12.x-red.svg)](https://laravel.com)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-purple.svg)](https://php.net)
 
-[SERVICE DESCRIPTION] microservice for Yiire ERP platform.
+[SERVICE DESCRIPTION] microservice for Lavalite ERP platform.
 
 ## Features
 
@@ -1103,7 +1103,7 @@ See [docs/API.md](docs/API.md) for complete API documentation.
 
 ## Integration with Auth Service
 
-This microservice integrates with the Yiire Auth microservice for:
+This microservice integrates with the Lavalite Auth microservice for:
 
 - User authentication
 - Organization management
@@ -1133,7 +1133,7 @@ MIT License
 ---
 
 **Version:** 1.0.0  
-**Maintainer:** Yiire Team
+**Maintainer:** Lavalite Team
 ```
 
 ---
@@ -1457,7 +1457,7 @@ CACHE_DRIVER=redis
 QUEUE_CONNECTION=redis
 
 # Auth Service
-AUTH_SERVICE_URL=https://auth.yiire.com
+AUTH_SERVICE_URL=https://auth.lavalite.org
 AUTH_SERVICE_API_KEY=your-production-api-key
 ```
 
@@ -1465,10 +1465,10 @@ AUTH_SERVICE_API_KEY=your-production-api-key
 
 ```bash
 # Build production image
-docker build -t yiire/[service]:latest .
+docker build -t lavalite/[service]:latest .
 
 # Push to registry
-docker push yiire/[service]:latest
+docker push lavalite/[service]:latest
 
 # Deploy with docker-compose
 docker-compose -f docker-compose.prod.yml up -d
@@ -1509,6 +1509,6 @@ docker-compose exec app php artisan view:cache
 ---
 
 <p align="center">
-  <strong>Yiire ERP Platform</strong><br>
+  <strong>Lavalite ERP Platform</strong><br>
   Building the future of enterprise resource planning
 </p>

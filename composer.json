@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "yiire/core",
+    "name": "lavalite/erp",
     "type": "project",
     "description": "SaaS ERP authentication and authorization microservice with multi-organization support, JWT authentication, RBAC, module management, and billing integration for user-based and module-based subscriptions.",
     "keywords": [
@@ -22,15 +22,15 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Yiire Team",
-            "email": "team@yiire.com"
+            "name": "Lavalite Team",
+            "email": "team@lavalite.org"
         }
     ],
-    "homepage": "https://github.com/yiire-erp/core",
+    "homepage": "https://github.com/lavalite/erp",
     "support": {
-        "issues": "https://github.com/yiire-erp/core/issues",
-        "source": "https://github.com/yiire-erp/core",
-        "docs": "https://github.com/yiire-erp/core#readme"
+        "issues": "https://github.com/lavalite/erp/issues",
+        "source": "https://github.com/lavalite/erp",
+        "docs": "https://github.com/lavalite/erp#readme"
     },
     "require": {
         "php": "^8.2",

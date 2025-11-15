@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Yiire ERP') }} - AI-Powered Enterprise Platform</title>
+        <title>{{ config('app.name', 'Lavalite ERP') }} - AI-Powered Enterprise Platform</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -65,7 +65,7 @@
                         </svg>
                     </div>
                     <span class="text-2xl font-display font-bold bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-                        Yiire ERP
+                        Lavalite ERP
                     </span>
                 </div>
                 
@@ -213,7 +213,7 @@
         <!-- Footer -->
         <footer class="relative z-10 px-6 py-12 border-t border-white/10">
             <div class="max-w-7xl mx-auto text-center text-slate-400 text-sm">
-                <p>&copy; {{ date('Y') }} Yiire ERP. Powered by AI. Built with Laravel.</p>
+                <p>&copy; {{ date('Y') }} Lavalite ERP. Powered by AI. Built with Laravel.</p>
             </div>
         </footer>
 
