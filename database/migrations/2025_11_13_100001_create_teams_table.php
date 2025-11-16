@@ -14,7 +14,7 @@ return new class extends Migration
         // Teams table - organization-scoped teams
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained()->onDelete('cascade');
+            $table->uuid('organization_id');
             $table->foreignId('parent_team_id')->nullable()->constrained('teams')->onDelete('set null');
             $table->string('name');
             $table->string('slug')->index();
@@ -27,6 +27,9 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            // Foreign key constraint for organization_id
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
+            
             // Unique constraint: slug per organization
             $table->unique(['organization_id', 'slug']);
         });
