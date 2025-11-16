@@ -15,7 +15,7 @@ class RolePermissionTest extends TestCase
     public function test_user_can_create_role_in_organization(): void
     {
         $this->markTestSkipped('Temporarily disabled - pivot table query issue needs investigation');
-        
+
         $user = User::factory()->create(['is_super_admin' => false]);
         $org = Organization::factory()->create();
         $user->organizations()->attach($org->id);
@@ -55,7 +55,7 @@ class RolePermissionTest extends TestCase
     public function test_user_can_assign_role_to_another_user(): void
     {
         $this->markTestSkipped('Temporarily disabled - pivot table query issue needs investigation');
-        
+
         $admin = User::factory()->create();
         $user = User::factory()->create();
         $org = Organization::factory()->create();
@@ -88,7 +88,7 @@ class RolePermissionTest extends TestCase
     public function test_user_can_create_permission_in_organization(): void
     {
         $this->markTestSkipped('Temporarily disabled - pivot table query issue needs investigation');
-        
+
         $user = User::factory()->create();
         $org = Organization::factory()->create();
         $user->organizations()->attach($org->id);

@@ -73,7 +73,7 @@ class OrganizationTest extends TestCase
     public function test_user_can_switch_organization_context(): void
     {
         $this->markTestSkipped('Temporarily disabled - response structure needs adjustment');
-        
+
         $user = User::factory()->create([
             'password' => Hash::make('password'),
         ]);
