@@ -31,7 +31,7 @@ class ModuleResource extends JsonResource
             'requires_license' => $this->requires_license,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Include pivot data if loaded (from organization relationship)
             'pivot' => $this->when($this->pivot, [
                 'is_enabled' => $this->pivot->is_enabled ?? null,

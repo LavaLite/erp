@@ -13,11 +13,11 @@ class OrganizationFactory extends Factory
     public function definition(): array
     {
         $name = fake()->company();
-        
+
         return [
             'id' => (string) Str::uuid(),
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 9999),
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1, 9999),
             'domain' => fake()->optional()->domainName(),
             'description' => fake()->optional()->sentence(),
             'settings' => [],

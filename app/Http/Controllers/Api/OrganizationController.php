@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrganizationResource;
-use App\Http\Resources\RoleResource;
 use App\Http\Resources\PermissionResource;
+use App\Http\Resources\RoleResource;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,6 +19,7 @@ class OrganizationController extends Controller
     {
         $organizations = $request->user()->organizations()->with('roles', 'permissions')
             ->paginate($request->get('per_page', 15));
+
         return OrganizationResource::collection($organizations);
     }
 
@@ -51,7 +52,7 @@ class OrganizationController extends Controller
         $organization = Organization::with('users', 'roles', 'permissions')->findOrFail($id);
 
         // Check if user has access to this organization
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -66,14 +67,14 @@ class OrganizationController extends Controller
         $organization = Organization::findOrFail($id);
 
         // Check if user has access to this organization
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|string|max:255|unique:organizations,slug,' . $id,
-            'domain' => 'nullable|string|unique:organizations,domain,' . $id,
+            'slug' => 'sometimes|string|max:255|unique:organizations,slug,'.$id,
+            'domain' => 'nullable|string|unique:organizations,domain,'.$id,
             'description' => 'nullable|string',
             'settings' => 'nullable|array',
             'is_active' => 'sometimes|boolean',
@@ -92,7 +93,7 @@ class OrganizationController extends Controller
         $organization = Organization::findOrFail($id);
 
         // Check if user has access to this organization
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -114,7 +115,7 @@ class OrganizationController extends Controller
         $user = User::findOrFail($request->user_id);
 
         // Check if requester has access to this organization
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -122,7 +123,7 @@ class OrganizationController extends Controller
 
         return response()->json([
             'message' => 'User added to organization successfully',
-            'organization' => new OrganizationResource($organization->load('users'))
+            'organization' => new OrganizationResource($organization->load('users')),
         ]);
     }
 
@@ -139,14 +140,14 @@ class OrganizationController extends Controller
         $user = User::findOrFail($request->user_id);
 
         // Check if requester has access to this organization
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $user->leaveOrganization($organization);
 
         return response()->json([
-            'message' => 'User removed from organization successfully'
+            'message' => 'User removed from organization successfully',
         ]);
     }
 
@@ -157,7 +158,7 @@ class OrganizationController extends Controller
     {
         $organization = $request->attributes->get('organization') ?? app('organization');
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json(['message' => 'No organization context set'], 404);
         }
 
@@ -171,7 +172,7 @@ class OrganizationController extends Controller
     {
         $organization = Organization::findOrFail($organizationId);
 
-        if (!$request->user()->belongsToOrganization($organization)) {
+        if (! $request->user()->belongsToOrganization($organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Organization extends Model
 {
-    use HasFactory, SoftDeletes, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -87,7 +87,7 @@ class Organization extends Model
                 'enabled_at',
                 'expires_at',
                 'settings',
-                'limits'
+                'limits',
             ])
             ->withTimestamps();
     }
@@ -147,7 +147,7 @@ class Organization extends Model
                 'expires_at' => $expiresAt,
                 'settings' => $settings,
                 'limits' => $limits,
-            ]
+            ],
         ]);
 
         return $this;
@@ -179,6 +179,7 @@ class Organization extends Model
     public function addUser(User $user): self
     {
         $this->users()->syncWithoutDetaching($user);
+
         return $this;
     }
 
@@ -188,6 +189,7 @@ class Organization extends Model
     public function removeUser(User $user): self
     {
         $this->users()->detach($user);
+
         return $this;
     }
 
@@ -238,6 +240,7 @@ class Organization extends Model
         }
 
         $currentActiveUsers = $this->getActiveUsersCount();
+
         return ($currentActiveUsers + $count) <= $this->max_users;
     }
 
@@ -254,8 +257,8 @@ class Organization extends Model
      */
     public function isOnTrial(): bool
     {
-        return $this->subscription_status === 'trial' 
-            && $this->trial_ends_at 
+        return $this->subscription_status === 'trial'
+            && $this->trial_ends_at
             && $this->trial_ends_at->isFuture();
     }
 
@@ -336,6 +339,7 @@ class Organization extends Model
     public function suspendSubscription(): self
     {
         $this->update(['subscription_status' => 'suspended']);
+
         return $this;
     }
 
@@ -345,6 +349,7 @@ class Organization extends Model
     public function cancelSubscription(): self
     {
         $this->update(['subscription_status' => 'cancelled']);
+
         return $this;
     }
 
@@ -354,6 +359,7 @@ class Organization extends Model
     public function updateUserLimit(?int $maxUsers): self
     {
         $this->update(['max_users' => $maxUsers]);
+
         return $this;
     }
 }

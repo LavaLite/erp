@@ -1,67 +1,60 @@
 <?php
 
-if (!function_exists('to_user_timezone')) {
+if (! function_exists('to_user_timezone')) {
     /**
      * Convert a datetime to the user's timezone
      *
      * @param  string|\DateTimeInterface  $datetime
-     * @param  string|null  $timezone
-     * @param  string  $format
-     * @return string
      */
     function to_user_timezone($datetime, ?string $timezone = null, string $format = 'Y-m-d H:i:s'): string
     {
-        if (!$datetime) {
+        if (! $datetime) {
             return '';
         }
 
         $timezone = $timezone ?? auth()->user()?->timezone ?? config('app.timezone', 'UTC');
-        
+
         return \Carbon\Carbon::parse($datetime)
             ->setTimezone($timezone)
             ->format($format);
     }
 }
 
-if (!function_exists('to_utc')) {
+if (! function_exists('to_utc')) {
     /**
      * Convert a datetime to UTC
      *
      * @param  string|\DateTimeInterface  $datetime
-     * @param  string|null  $fromTimezone
-     * @return \Carbon\Carbon
      */
     function to_utc($datetime, ?string $fromTimezone = null): \Carbon\Carbon
     {
-        if (!$datetime) {
+        if (! $datetime) {
             return \Carbon\Carbon::now('UTC');
         }
 
         $fromTimezone = $fromTimezone ?? auth()->user()?->timezone ?? config('app.timezone', 'UTC');
-        
+
         return \Carbon\Carbon::parse($datetime, $fromTimezone)->setTimezone('UTC');
     }
 }
 
-if (!function_exists('format_datetime')) {
+if (! function_exists('format_datetime')) {
     /**
      * Format a datetime in user's timezone and locale
      *
      * @param  string|\DateTimeInterface  $datetime
      * @param  string  $format  Options: 'short', 'medium', 'long', 'full', or custom format
-     * @param  string|null  $timezone
-     * @return string
      */
     function format_datetime($datetime, string $format = 'medium', ?string $timezone = null): string
     {
-        if (!$datetime) {
+        if (! $datetime) {
             return '';
         }
 
         $timezone = $timezone ?? auth()->user()?->timezone ?? config('app.timezone', 'UTC');
         $carbon = \Carbon\Carbon::parse($datetime)->setTimezone($timezone);
 
-        return match($format) {
+        return match ($format) {
             'short' => $carbon->format('Y-m-d H:i'),
             'medium' => $carbon->format('M d, Y H:i'),
             'long' => $carbon->format('F d, Y g:i A'),
@@ -74,11 +67,9 @@ if (!function_exists('format_datetime')) {
     }
 }
 
-if (!function_exists('current_timezone')) {
+if (! function_exists('current_timezone')) {
     /**
      * Get the current user/organization timezone
-     *
-     * @return string
      */
     function current_timezone(): string
     {
@@ -86,11 +77,9 @@ if (!function_exists('current_timezone')) {
     }
 }
 
-if (!function_exists('list_timezones')) {
+if (! function_exists('list_timezones')) {
     /**
      * Get list of common timezones grouped by region
-     *
-     * @return array
      */
     function list_timezones(): array
     {
@@ -116,34 +105,28 @@ if (!function_exists('list_timezones')) {
     }
 }
 
-if (!function_exists('timezone_offset')) {
+if (! function_exists('timezone_offset')) {
     /**
      * Get timezone offset in hours
-     *
-     * @param  string|null  $timezone
-     * @return string
      */
     function timezone_offset(?string $timezone = null): string
     {
         $timezone = $timezone ?? current_timezone();
         $tz = new \DateTimeZone($timezone);
         $offset = $tz->getOffset(new \DateTime('now', $tz));
-        
+
         $hours = abs($offset) / 3600;
         $minutes = (abs($offset) % 3600) / 60;
-        
+
         $sign = $offset >= 0 ? '+' : '-';
-        
+
         return sprintf('%s%02d:%02d', $sign, $hours, $minutes);
     }
 }
 
-if (!function_exists('is_valid_timezone')) {
+if (! function_exists('is_valid_timezone')) {
     /**
      * Check if a timezone is valid
-     *
-     * @param  string  $timezone
-     * @return bool
      */
     function is_valid_timezone(string $timezone): bool
     {
@@ -151,14 +134,11 @@ if (!function_exists('is_valid_timezone')) {
     }
 }
 
-if (!function_exists('convert_timezone')) {
+if (! function_exists('convert_timezone')) {
     /**
      * Convert datetime from one timezone to another
      *
      * @param  string|\DateTimeInterface  $datetime
-     * @param  string  $fromTimezone
-     * @param  string  $toTimezone
-     * @return \Carbon\Carbon
      */
     function convert_timezone($datetime, string $fromTimezone, string $toTimezone): \Carbon\Carbon
     {
@@ -166,11 +146,9 @@ if (!function_exists('convert_timezone')) {
     }
 }
 
-if (!function_exists('get_popular_timezones')) {
+if (! function_exists('get_popular_timezones')) {
     /**
      * Get list of most commonly used timezones
-     *
-     * @return array
      */
     function get_popular_timezones(): array
     {

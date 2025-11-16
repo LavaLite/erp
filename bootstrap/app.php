@@ -17,7 +17,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetTimezone::class,
             \App\Http\Middleware\SetLocale::class,
         ]);
-        
+
+        // Add session middleware for API routes in testing environment
+        if (app()->environment('testing')) {
+            $middleware->api(append: [
+                \Illuminate\Session\Middleware\StartSession::class,
+            ]);
+        }
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'permission' => \App\Http\Middleware\PermissionMiddleware::class,

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -18,7 +18,7 @@ class MultiOrganizationSeeder extends Seeder
     {
         // Create global roles (available across all organizations)
         $this->command->info('Creating global roles...');
-        
+
         $superAdminRole = Role::firstOrCreate(
             ['organization_id' => 'global', 'slug' => 'superadmin'],
             [
@@ -82,13 +82,13 @@ class MultiOrganizationSeeder extends Seeder
 
         // Create global permissions
         $this->command->info('Creating global permissions...');
-        
+
         $globalPermissionsData = [
             // Super admin permissions
             ['name' => 'Manage All Organizations', 'slug' => 'manage-all-organizations'],
             ['name' => 'View All Data', 'slug' => 'view-all-data'],
             ['name' => 'Assign Super Admin Role', 'slug' => 'assign-superadmin-role'],
-            
+
             // Global admin permissions (user, role, permission management)
             ['name' => 'Manage Global Roles', 'slug' => 'manage-global-roles'],
             ['name' => 'View Users', 'slug' => 'view-users'],
@@ -113,14 +113,14 @@ class MultiOrganizationSeeder extends Seeder
                 ['organization_id' => 'global', 'slug' => $perm['slug']],
                 [
                     'name' => $perm['name'],
-                    'description' => $perm['name'] . ' - Global permission',
+                    'description' => $perm['name'].' - Global permission',
                 ]
             );
         }
 
         // Assign all global permissions to super admin role
         $superAdminRole->permissions()->sync(collect($globalPermissions)->pluck('id'));
-        
+
         // Assign user/role/permission management permissions to admin role
         $adminPermissions = Permission::where('organization_id', 'global')
             ->whereIn('slug', [
@@ -231,7 +231,7 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Assigning roles to Global Admin...');
         $globalAdmin->joinOrganization($organization1);
         $globalAdmin->assignRoleInOrganization('admin', $organization1);
-        
+
         $globalAdmin->joinOrganization($organization2);
         $globalAdmin->assignRoleInOrganization('admin', $organization2);
 
@@ -239,7 +239,7 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Assigning roles to User Admin...');
         $userAdmin->joinOrganization($organization1);
         $userAdmin->assignRoleInOrganization('user-admin', $organization1);
-        
+
         $userAdmin->joinOrganization($organization2);
         $userAdmin->assignRoleInOrganization('user-admin', $organization2);
 
@@ -247,7 +247,7 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Assigning roles to Super Admin...');
         $superAdmin->joinOrganization($organization1);
         $superAdmin->assignRoleInOrganization('superadmin', $organization1);
-        
+
         $superAdmin->joinOrganization($organization2);
         $superAdmin->assignRoleInOrganization('superadmin', $organization2);
 
@@ -255,7 +255,7 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Assigning roles to Regular User...');
         $user->joinOrganization($organization1);
         $user->assignRoleInOrganization('user', $organization1);
-        
+
         $user->joinOrganization($organization2);
         $user->assignRoleInOrganization('user', $organization2);
 
@@ -263,7 +263,7 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Assigning roles to Client...');
         $client->joinOrganization($organization1);
         $client->assignRoleInOrganization('client', $organization1);
-        
+
         $client->joinOrganization($organization2);
         $client->assignRoleInOrganization('client', $organization2);
 
@@ -290,4 +290,3 @@ class MultiOrganizationSeeder extends Seeder
         $this->command->info('Password for all users: password');
     }
 }
-

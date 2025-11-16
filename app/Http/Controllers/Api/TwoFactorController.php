@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\Image\SvgImageBackEnd;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 
 class TwoFactorController extends Controller
 {
@@ -18,7 +18,7 @@ class TwoFactorController extends Controller
 
     public function __construct()
     {
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
     }
 
     /**
@@ -47,7 +47,7 @@ class TwoFactorController extends Controller
         // Generate SVG QR code
         $renderer = new ImageRenderer(
             new RendererStyle(200),
-            new SvgImageBackEnd()
+            new SvgImageBackEnd
         );
         $writer = new Writer($renderer);
         $qrCodeSvg = $writer->writeString($qrCodeUrl);
@@ -87,7 +87,7 @@ class TwoFactorController extends Controller
         $secret = $request->session()->get('2fa_secret');
         $recoveryCodes = $request->session()->get('2fa_recovery_codes');
 
-        if (!$secret || !$recoveryCodes) {
+        if (! $secret || ! $recoveryCodes) {
             return response()->json([
                 'error' => 'Please enable 2FA first.',
             ], 400);
@@ -96,7 +96,7 @@ class TwoFactorController extends Controller
         // Verify the code
         $valid = $this->google2fa->verifyKey($secret, $request->code);
 
-        if (!$valid) {
+        if (! $valid) {
             return response()->json([
                 'error' => 'Invalid authentication code.',
             ], 400);
@@ -125,14 +125,14 @@ class TwoFactorController extends Controller
 
         $user = $request->user();
 
-        if (!$user->two_factor_enabled) {
+        if (! $user->two_factor_enabled) {
             return response()->json([
                 'error' => 'Two-factor authentication is not enabled.',
             ], 400);
         }
 
         // Verify password
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'error' => 'Invalid password.',
             ], 400);
@@ -158,7 +158,7 @@ class TwoFactorController extends Controller
 
         $user = \App\Models\User::where('email', $request->email)->first();
 
-        if (!$user || !$user->two_factor_enabled) {
+        if (! $user || ! $user->two_factor_enabled) {
             return response()->json([
                 'error' => 'Two-factor authentication is not enabled for this user.',
             ], 400);
@@ -184,7 +184,7 @@ class TwoFactorController extends Controller
         // Verify TOTP code
         $valid = $this->google2fa->verifyKey($secret, $request->code);
 
-        if (!$valid) {
+        if (! $valid) {
             return response()->json([
                 'error' => 'Invalid authentication code.',
                 'valid' => false,
@@ -208,14 +208,14 @@ class TwoFactorController extends Controller
 
         $user = $request->user();
 
-        if (!$user->two_factor_enabled) {
+        if (! $user->two_factor_enabled) {
             return response()->json([
                 'error' => 'Two-factor authentication is not enabled.',
             ], 400);
         }
 
         // Verify password
-        if (!Hash::check($request->password, $user->password)) {
+        if (! Hash::check($request->password, $user->password)) {
             return response()->json([
                 'error' => 'Invalid password.',
             ], 400);
@@ -236,16 +236,13 @@ class TwoFactorController extends Controller
 
     /**
      * Generate recovery codes.
-     *
-     * @param int $count
-     * @return array
      */
     protected function generateRecoveryCodes(int $count = 8): array
     {
         $codes = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $codes[] = Str::random(10) . '-' . Str::random(10);
+            $codes[] = Str::random(10).'-'.Str::random(10);
         }
 
         return $codes;

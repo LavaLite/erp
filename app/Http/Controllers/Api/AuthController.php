@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
 use App\Http\Resources\OrganizationResource;
+use App\Http\Resources\UserResource;
 use App\Mail\VerifyEmail;
-use App\Models\RefreshToken;
 use App\Models\Organization;
+use App\Models\RefreshToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -45,10 +45,10 @@ class AuthController extends Controller
 
         // Send email verification
         $token = $user->generateEmailVerificationToken();
-        $verificationUrl = config('app.frontend_url', config('app.url')) 
-            . '/verify-email?token=' . $token 
-            . '&email=' . urlencode($user->email);
-        
+        $verificationUrl = config('app.frontend_url', config('app.url'))
+            .'/verify-email?token='.$token
+            .'&email='.urlencode($user->email);
+
         Mail::to($user->email)->send(new VerifyEmail($user, $verificationUrl));
 
         // Note: Roles are assigned when user joins a tenant via joinOrganization()
@@ -75,7 +75,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -83,7 +83,7 @@ class AuthController extends Controller
 
         // Check if 2FA is enabled
         if ($user->two_factor_enabled) {
-            if (!$request->two_factor_code) {
+            if (! $request->two_factor_code) {
                 return response()->json([
                     'requires_2fa' => true,
                     'message' => 'Two-factor authentication code required.',
@@ -91,9 +91,9 @@ class AuthController extends Controller
             }
 
             // Verify 2FA code
-            $google2fa = new \PragmaRX\Google2FA\Google2FA();
+            $google2fa = new \PragmaRX\Google2FA\Google2FA;
             $secret = $user->getTwoFactorSecret();
-            
+
             // Check if it's a recovery code
             $valid = false;
             if (strlen($request->two_factor_code) > 6) {
@@ -102,7 +102,7 @@ class AuthController extends Controller
                 $valid = $google2fa->verifyKey($secret, $request->two_factor_code);
             }
 
-            if (!$valid) {
+            if (! $valid) {
                 return response()->json([
                     'error' => 'Invalid two-factor authentication code.',
                 ], 401);
@@ -127,14 +127,14 @@ class AuthController extends Controller
         if ($request->organization_id) {
             // Find tenant by UUID only
             $organization = Organization::find($request->organization_id);
-            
+
             if ($organization && $user->belongsToOrganization($organization)) {
                 $currentOrganization = $organizations->firstWhere('id', $organization->id);
             }
         }
 
         // If no tenant specified or invalid, use first organization
-        if (!$currentOrganization && $organizations->isNotEmpty()) {
+        if (! $currentOrganization && $organizations->isNotEmpty()) {
             $currentOrganization = $organizations->first();
         }
 
@@ -190,15 +190,15 @@ class AuthController extends Controller
     {
         try {
             $user = $request->user();
-            
+
             // Invalidate JWT access token
             JWTAuth::invalidate(JWTAuth::getToken());
-            
+
             // Revoke all refresh tokens for this user
             RefreshToken::where('user_id', $user->id)
                 ->whereNull('revoked_at')
                 ->update(['revoked_at' => now()]);
-            
+
             return response()->json([
                 'message' => 'Successfully logged out',
             ])->cookie('refresh_token', '', -1); // Delete refresh token cookie
@@ -217,7 +217,7 @@ class AuthController extends Controller
         // Get refresh token from cookie or body
         $refreshTokenString = $request->cookie('refresh_token') ?? $request->input('refresh_token');
 
-        if (!$refreshTokenString) {
+        if (! $refreshTokenString) {
             return response()->json([
                 'error' => 'Refresh token not provided',
             ], 401);
@@ -226,14 +226,14 @@ class AuthController extends Controller
         // Find the refresh token
         $refreshToken = RefreshToken::where('token', $refreshTokenString)->first();
 
-        if (!$refreshToken) {
+        if (! $refreshToken) {
             return response()->json([
                 'error' => 'Invalid refresh token',
             ], 401);
         }
 
         // Check if token is valid
-        if (!$refreshToken->isValid()) {
+        if (! $refreshToken->isValid()) {
             return response()->json([
                 'error' => 'Refresh token has expired or been revoked',
             ], 401);
@@ -248,7 +248,7 @@ class AuthController extends Controller
         $permissionsSlugs = [];
         $moduleSlugs = [];
         $teamSlugs = [];
-        
+
         if ($tenantId) {
             $organization = Organization::find($tenantId);
             if ($organization) {
@@ -307,17 +307,17 @@ class AuthController extends Controller
         ]);
 
         $user = $request->user();
-        
+
         // Find tenant by UUID only
         $organization = Organization::find($request->organization_id);
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json([
                 'error' => 'Organization not found.',
             ], 404);
         }
 
-        if (!$user->belongsToOrganization($organization)) {
+        if (! $user->belongsToOrganization($organization)) {
             return response()->json([
                 'error' => 'You do not have access to this organization.',
             ], 403);
@@ -360,22 +360,22 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
             'expires_in' => config('jwt.ttl') * 60,
             'current_organization' => $currentOrganization,
-            'message' => 'Successfully switched to ' . $organization->name,
+            'message' => 'Successfully switched to '.$organization->name,
         ]);
     }
 
     public function user(Request $request)
     {
         $user = $request->user();
-        
+
         // Get JWT token payload to extract current organization
         try {
             $payload = JWTAuth::parseToken()->getPayload();
             $tenantId = $payload->get('organization_id');
-            
+
             if ($tenantId) {
                 $organization = Organization::find($tenantId);
-                
+
                 if ($organization && $user->belongsToOrganization($organization)) {
                     return response()->json([
                         'user' => new UserResource($user),
@@ -389,10 +389,9 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Token parsing failed, return basic user info
         }
-        
+
         return response()->json([
             'user' => new UserResource($user),
         ]);
     }
 }
-

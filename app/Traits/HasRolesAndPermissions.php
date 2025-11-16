@@ -61,6 +61,7 @@ trait HasRolesAndPermissions
             if ($role instanceof Role) {
                 return $role->id;
             }
+
             return Role::where('slug', $role)->firstOrFail()->id;
         })->toArray();
 
@@ -127,10 +128,11 @@ trait HasRolesAndPermissions
     public function hasAllRoles(array $roles): bool
     {
         foreach ($roles as $role) {
-            if (!$this->hasRole($role)) {
+            if (! $this->hasRole($role)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -170,6 +172,7 @@ trait HasRolesAndPermissions
                 return true;
             }
         }
+
         return false;
     }
 
@@ -179,10 +182,11 @@ trait HasRolesAndPermissions
     public function hasAllPermissions(array $permissions): bool
     {
         foreach ($permissions as $permission) {
-            if (!$this->hasPermission($permission)) {
+            if (! $this->hasPermission($permission)) {
                 return false;
             }
         }
+
         return true;
     }
 

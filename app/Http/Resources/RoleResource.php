@@ -22,10 +22,10 @@ class RoleResource extends JsonResource
             'organization_id' => $this->organization_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Include permissions if loaded
             'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
-            
+
             // Include organization if loaded
             'organization' => new OrganizationResource($this->whenLoaded('organization')),
         ];

@@ -21,6 +21,7 @@ class TeamSeeder extends Seeder
 
         if ($organizations->isEmpty()) {
             echo "No organizations found. Please run MultiOrganizationSeeder first.\n";
+
             return;
         }
 
@@ -144,7 +145,7 @@ class TeamSeeder extends Seeder
 
         $totalTeams = Team::count();
         echo "\n✓ Total teams created: {$totalTeams}\n";
-        echo "✓ Teams with hierarchies: " . Team::whereNotNull('parent_team_id')->count() . "\n";
-        echo "✓ Root teams: " . Team::whereNull('parent_team_id')->count() . "\n";
+        echo '✓ Teams with hierarchies: '.Team::whereNotNull('parent_team_id')->count()."\n";
+        echo '✓ Root teams: '.Team::whereNull('parent_team_id')->count()."\n";
     }
 }

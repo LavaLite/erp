@@ -2,9 +2,9 @@
 
 namespace App\Traits;
 
+use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\Organization;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait HasMultiOrganizationRolesAndPermissions
@@ -43,11 +43,11 @@ trait HasMultiOrganizationRolesAndPermissions
     public function rolesInOrganization(Organization|int|string $organization): BelongsToMany
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
-        return $this->roles()->where(function($query) use ($organizationId) {
+
+        return $this->roles()->where(function ($query) use ($organizationId) {
             $query->wherePivot('organization_id', $organizationId)
-                  ->orWhereNull('roles.organization_id')
-                  ->orWhere('roles.organization_id', 'global');
+                ->orWhereNull('roles.organization_id')
+                ->orWhere('roles.organization_id', 'global');
         });
     }
 
@@ -57,30 +57,30 @@ trait HasMultiOrganizationRolesAndPermissions
     public function assignRoleInOrganization(Role|string $role, Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_string($role)) {
             $roleSlug = $role;
-            
+
             $role = Role::where('slug', $roleSlug)
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->where('organization_id', 'global')
-                          ->orWhereNull('organization_id');
+                        ->orWhereNull('organization_id');
                 })
                 ->first();
-            
-            if (!$role) {
+
+            if (! $role) {
                 $role = Role::where('slug', $roleSlug)
                     ->where('organization_id', $organizationId)
                     ->first();
-                    
-                if (!$role) {
+
+                if (! $role) {
                     throw new \Exception("Role '{$roleSlug}' not found for organization {$organizationId} or as global role");
                 }
             }
         }
 
         $this->roles()->syncWithoutDetaching([
-            $role->id => ['organization_id' => $organizationId]
+            $role->id => ['organization_id' => $organizationId],
         ]);
 
         return $this;
@@ -92,7 +92,7 @@ trait HasMultiOrganizationRolesAndPermissions
     public function removeRoleInOrganization(Role|string $role, Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_string($role)) {
             $role = Role::where('slug', $role)
                 ->where('organization_id', $organizationId)
@@ -110,9 +110,9 @@ trait HasMultiOrganizationRolesAndPermissions
     public function syncRolesInOrganization(array $roles, Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         $this->roles()->wherePivot('organization_id', $organizationId)->detach();
-        
+
         foreach ($roles as $role) {
             $this->assignRoleInOrganization($role, $organizationId);
         }
@@ -126,35 +126,23 @@ trait HasMultiOrganizationRolesAndPermissions
     public function hasRoleInOrganization(Role|string|array $role, Organization|int|string $organization): bool
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_array($role)) {
             return $this->roles()
-                ->where(function($query) use ($organizationId) {
-                    $query->wherePivot('organization_id', $organizationId)
-                          ->orWhereNull('roles.organization_id')
-                          ->orWhere('roles.organization_id', 'global');
-                })
+                ->where('role_user.organization_id', $organizationId)
                 ->whereIn('slug', $role)
                 ->exists();
         }
 
         if (is_string($role)) {
             return $this->roles()
-                ->where(function($query) use ($organizationId) {
-                    $query->wherePivot('organization_id', $organizationId)
-                          ->orWhereNull('roles.organization_id')
-                          ->orWhere('roles.organization_id', 'global');
-                })
+                ->where('role_user.organization_id', $organizationId)
                 ->where('slug', $role)
                 ->exists();
         }
 
         return $this->roles()
-            ->where(function($query) use ($organizationId) {
-                $query->wherePivot('organization_id', $organizationId)
-                      ->orWhereNull('roles.organization_id')
-                      ->orWhere('roles.organization_id', 'global');
-            })
+            ->where('role_user.organization_id', $organizationId)
             ->where('roles.id', $role->id)
             ->exists();
     }
@@ -165,9 +153,9 @@ trait HasMultiOrganizationRolesAndPermissions
     public function hasAnyRoleInOrganization(array $roles, Organization|int|string $organization): bool
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         return $this->roles()
-            ->wherePivot('organization_id', $organizationId)
+            ->where('role_user.organization_id', $organizationId)
             ->whereIn('slug', $roles)
             ->exists();
     }
@@ -178,10 +166,11 @@ trait HasMultiOrganizationRolesAndPermissions
     public function hasAllRolesInOrganization(array $roles, Organization|int|string $organization): bool
     {
         foreach ($roles as $role) {
-            if (!$this->hasRoleInOrganization($role, $organization)) {
+            if (! $this->hasRoleInOrganization($role, $organization)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -191,7 +180,7 @@ trait HasMultiOrganizationRolesAndPermissions
     public function givePermissionTo(Permission|string $permission, Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_string($permission)) {
             $permission = Permission::where('slug', $permission)
                 ->where('organization_id', $organizationId)
@@ -209,7 +198,7 @@ trait HasMultiOrganizationRolesAndPermissions
     public function revokePermissionTo(Permission|string $permission, Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_string($permission)) {
             $permission = Permission::where('slug', $permission)
                 ->where('organization_id', $organizationId)
@@ -227,14 +216,14 @@ trait HasMultiOrganizationRolesAndPermissions
     public function hasPermissionInOrganization(Permission|string $permission, Organization|int|string $organization): bool
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         if (is_string($permission)) {
             if ($this->permissions()
                 ->where('slug', $permission)
-                ->where(function($query) use ($organizationId) {
+                ->where(function ($query) use ($organizationId) {
                     $query->where('organization_id', $organizationId)
-                          ->orWhereNull('organization_id')
-                          ->orWhere('organization_id', 'global');
+                        ->orWhereNull('organization_id')
+                        ->orWhere('organization_id', 'global');
                 })
                 ->exists()) {
                 return true;
@@ -246,7 +235,7 @@ trait HasMultiOrganizationRolesAndPermissions
         }
 
         $roles = $this->rolesInOrganization($organizationId)->get();
-        
+
         foreach ($roles as $role) {
             if ($role->hasPermission($permission)) {
                 return true;
@@ -266,6 +255,7 @@ trait HasMultiOrganizationRolesAndPermissions
                 return true;
             }
         }
+
         return false;
     }
 
@@ -275,10 +265,11 @@ trait HasMultiOrganizationRolesAndPermissions
     public function hasAllPermissionsInOrganization(array $permissions, Organization|int|string $organization): bool
     {
         foreach ($permissions as $permission) {
-            if (!$this->hasPermissionInOrganization($permission, $organization)) {
+            if (! $this->hasPermissionInOrganization($permission, $organization)) {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -288,17 +279,17 @@ trait HasMultiOrganizationRolesAndPermissions
     public function getAllPermissionsInOrganization(Organization|int|string $organization)
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         $directPermissions = $this->permissions()
-            ->where(function($query) use ($organizationId) {
+            ->where(function ($query) use ($organizationId) {
                 $query->where('organization_id', $organizationId)
-                      ->orWhereNull('organization_id')
-                      ->orWhere('organization_id', 'global');
+                    ->orWhereNull('organization_id')
+                    ->orWhere('organization_id', 'global');
             })
             ->get();
 
         $roles = $this->rolesInOrganization($organizationId)->get();
-        
+
         $rolePermissions = $roles->map(function ($role) {
             return $role->permissions;
         })->flatten();
@@ -312,7 +303,7 @@ trait HasMultiOrganizationRolesAndPermissions
     public function joinOrganization(Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         $this->organizations()->syncWithoutDetaching($organizationId);
 
         return $this;
@@ -324,9 +315,9 @@ trait HasMultiOrganizationRolesAndPermissions
     public function leaveOrganization(Organization|int|string $organization): self
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         $this->roles()->wherePivot('organization_id', $organizationId)->detach();
-        
+
         $this->organizations()->detach($organizationId);
 
         return $this;
@@ -338,7 +329,7 @@ trait HasMultiOrganizationRolesAndPermissions
     public function belongsToOrganization(Organization|int|string $organization): bool
     {
         $organizationId = $organization instanceof Organization ? $organization->id : $organization;
-        
+
         return $this->organizations()->where('organization_id', $organizationId)->exists();
     }
 

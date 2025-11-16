@@ -37,7 +37,7 @@ class SetLocale
 
         // Validate locale is supported
         $supportedLocales = ['en', 'fr', 'es'];
-        if (!in_array($locale, $supportedLocales)) {
+        if (! in_array($locale, $supportedLocales)) {
             $locale = config('app.fallback_locale', 'en');
         }
 
@@ -54,17 +54,17 @@ class SetLocale
     {
         // Split by comma and get first preference
         $languages = explode(',', $acceptLanguage);
-        
+
         if (empty($languages)) {
             return config('app.locale', 'en');
         }
 
         // Get first language and remove quality value (;q=0.9)
         $primaryLanguage = explode(';', $languages[0])[0];
-        
+
         // Extract base language code (en-US -> en)
         $locale = strtolower(substr($primaryLanguage, 0, 2));
-        
+
         return $locale;
     }
 }

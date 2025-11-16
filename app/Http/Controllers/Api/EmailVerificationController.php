@@ -27,9 +27,9 @@ class EmailVerificationController extends Controller
         $token = $user->generateEmailVerificationToken();
 
         // Build verification URL
-        $verificationUrl = config('app.frontend_url', config('app.url')) 
-            . '/verify-email?token=' . $token 
-            . '&email=' . urlencode($user->email);
+        $verificationUrl = config('app.frontend_url', config('app.url'))
+            .'/verify-email?token='.$token
+            .'&email='.urlencode($user->email);
 
         // Send email
         Mail::to($user->email)->send(new VerifyEmail($user, $verificationUrl));
@@ -51,7 +51,7 @@ class EmailVerificationController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'error' => 'User not found.',
             ], 404);
@@ -63,7 +63,7 @@ class EmailVerificationController extends Controller
             ]);
         }
 
-        if (!$user->verifyEmail($request->token)) {
+        if (! $user->verifyEmail($request->token)) {
             return response()->json([
                 'error' => 'Invalid or expired verification token.',
             ], 400);
@@ -85,7 +85,7 @@ class EmailVerificationController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'error' => 'User not found.',
             ], 404);
@@ -108,9 +108,9 @@ class EmailVerificationController extends Controller
         $token = $user->generateEmailVerificationToken();
 
         // Build verification URL
-        $verificationUrl = config('app.frontend_url', config('app.url')) 
-            . '/verify-email?token=' . $token 
-            . '&email=' . urlencode($user->email);
+        $verificationUrl = config('app.frontend_url', config('app.url'))
+            .'/verify-email?token='.$token
+            .'&email='.urlencode($user->email);
 
         // Send email
         Mail::to($user->email)->send(new VerifyEmail($user, $verificationUrl));

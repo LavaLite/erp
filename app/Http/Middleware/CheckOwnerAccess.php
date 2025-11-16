@@ -23,21 +23,21 @@ class CheckOwnerAccess
         try {
             // Parse JWT token and get payload
             $payload = JWTAuth::parseToken()->getPayload();
-            
+
             // Get is_owner flag from JWT claims
             $isOwner = $payload->get('is_owner', false);
-            
+
             // Check if user is owner
-            if (!$isOwner) {
+            if (! $isOwner) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Access denied. Only organization owners can perform this action.',
                 ], 403);
             }
-            
+
             // User is owner, proceed
             return $next($request);
-            
+
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 'success' => false,

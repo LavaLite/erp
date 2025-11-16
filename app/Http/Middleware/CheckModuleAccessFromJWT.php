@@ -25,25 +25,26 @@ class CheckModuleAccessFromJWT
         try {
             // Parse JWT token and get payload
             $payload = JWTAuth::parseToken()->getPayload();
-            
+
             // Get user-specific modules (hybrid: team + role based)
             $userModules = $payload->get('user_modules', []);
-            
+
             // Get organization modules as fallback
             $orgModules = $payload->get('modules', []);
-            
+
             // Get user roles for super admin check
             $roles = $payload->get('roles', []);
-            
+
             // Super admins bypass module restrictions
             if (in_array('superadmin', $roles) || in_array('admin', $roles)) {
                 $request->merge(['_module_slug' => $moduleSlug]);
+
                 return $next($request);
             }
-            
+
             // Check user-specific modules first (hybrid approach)
-            if (!empty($userModules)) {
-                if (!in_array($moduleSlug, $userModules)) {
+            if (! empty($userModules)) {
+                if (! in_array($moduleSlug, $userModules)) {
                     return response()->json([
                         'success' => false,
                         'message' => "Access denied. You don't have permission to access module '{$moduleSlug}'.",
@@ -53,7 +54,7 @@ class CheckModuleAccessFromJWT
                 }
             } else {
                 // Fallback: Check organization-level modules
-                if (!in_array($moduleSlug, $orgModules)) {
+                if (! in_array($moduleSlug, $orgModules)) {
                     return response()->json([
                         'success' => false,
                         'message' => "Access denied. Module '{$moduleSlug}' is not enabled for this organization.",
@@ -62,12 +63,12 @@ class CheckModuleAccessFromJWT
                     ], 403);
                 }
             }
-            
+
             // Module access granted, attach to request for use in controllers
             $request->merge(['_module_slug' => $moduleSlug]);
-            
+
             return $next($request);
-            
+
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 'success' => false,

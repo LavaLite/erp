@@ -15,7 +15,7 @@ class TwoFactorAuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->withSession([])->actingAsUser($user)
+        $response = $this->actingAsUser($user)
             ->postJson('/api/2fa/enable');
 
         $response->assertStatus(200)

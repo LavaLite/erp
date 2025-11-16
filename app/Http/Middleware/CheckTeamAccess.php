@@ -26,7 +26,7 @@ class CheckTeamAccess
         try {
             // Get JWT payload
             $payload = JWTAuth::parseToken()->getPayload();
-            
+
             // Get teams from JWT
             $userTeams = $payload->get('teams', []);
 
@@ -34,18 +34,19 @@ class CheckTeamAccess
             if (empty($teams)) {
                 if (empty($userTeams)) {
                     return response()->json([
-                        'error' => 'Team membership required'
+                        'error' => 'Team membership required',
                     ], 403);
                 }
+
                 return $next($request);
             }
 
             // Check if user belongs to any of the specified teams
-            $hasAccess = !empty(array_intersect($teams, $userTeams));
+            $hasAccess = ! empty(array_intersect($teams, $userTeams));
 
-            if (!$hasAccess) {
+            if (! $hasAccess) {
                 return response()->json([
-                    'error' => 'Access denied. Required team: ' . implode(' or ', $teams),
+                    'error' => 'Access denied. Required team: '.implode(' or ', $teams),
                     'your_teams' => $userTeams,
                 ], 403);
             }
@@ -54,7 +55,7 @@ class CheckTeamAccess
             $request->merge(['user_teams' => $userTeams]);
 
             return $next($request);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Team validation failed',

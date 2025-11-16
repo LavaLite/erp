@@ -213,7 +213,7 @@ class Team extends Model
                 'role' => $role,
                 'invited_by' => $invitedBy?->id,
                 'joined_at' => now(),
-            ]
+            ],
         ]);
     }
 

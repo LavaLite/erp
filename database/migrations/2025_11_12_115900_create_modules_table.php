@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * Creates the modules table for ERP module management.
      * Note: organization_module pivot table is created in the organizations migration.
      */
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true); // Module availability
             $table->boolean('requires_license')->default(false); // Whether module needs license
             $table->timestamps();
-            
+
             $table->index(['category', 'is_active']);
             $table->index('is_core');
         });

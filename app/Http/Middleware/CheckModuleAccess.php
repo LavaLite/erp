@@ -21,7 +21,7 @@ class CheckModuleAccess
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated',
@@ -29,12 +29,12 @@ class CheckModuleAccess
         }
 
         // Get organization from request
-        $organizationId = $request->route('organizationId') 
-            ?? $request->route('organization') 
+        $organizationId = $request->route('organizationId')
+            ?? $request->route('organization')
             ?? $request->input('organization_id')
             ?? $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required',
@@ -43,7 +43,7 @@ class CheckModuleAccess
 
         $organization = \App\Models\Organization::find($organizationId);
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization not found',
@@ -51,7 +51,7 @@ class CheckModuleAccess
         }
 
         // Check if organization has active subscription
-        if (!$organization->hasActiveSubscription()) {
+        if (! $organization->hasActiveSubscription()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization subscription is not active.',
@@ -60,7 +60,7 @@ class CheckModuleAccess
         }
 
         // Check if organization has access to the module
-        if (!$organization->hasModule($moduleSlug)) {
+        if (! $organization->hasModule($moduleSlug)) {
             return response()->json([
                 'success' => false,
                 'message' => "Access denied. Module '{$moduleSlug}' is not enabled for this organization.",

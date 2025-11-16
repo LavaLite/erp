@@ -33,10 +33,10 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Include roles if loaded
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
-            
+
             // Include organizations if loaded
             'organizations' => OrganizationResource::collection($this->whenLoaded('organizations')),
         ];

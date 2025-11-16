@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RolePermissionSeeder extends Seeder
@@ -20,12 +19,12 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'Create Users', 'slug' => 'create-users', 'description' => 'Can create new users', 'organization_id' => 'global'],
             ['name' => 'Edit Users', 'slug' => 'edit-users', 'description' => 'Can edit existing users', 'organization_id' => 'global'],
             ['name' => 'Delete Users', 'slug' => 'delete-users', 'description' => 'Can delete users', 'organization_id' => 'global'],
-            
+
             ['name' => 'View Roles', 'slug' => 'view-roles', 'description' => 'Can view roles', 'organization_id' => 'global'],
             ['name' => 'Create Roles', 'slug' => 'create-roles', 'description' => 'Can create roles', 'organization_id' => 'global'],
             ['name' => 'Edit Roles', 'slug' => 'edit-roles', 'description' => 'Can edit roles', 'organization_id' => 'global'],
             ['name' => 'Delete Roles', 'slug' => 'delete-roles', 'description' => 'Can delete roles', 'organization_id' => 'global'],
-            
+
             ['name' => 'Assign Roles', 'slug' => 'assign-roles', 'description' => 'Can assign roles to users', 'organization_id' => 'global'],
             ['name' => 'Assign Permissions', 'slug' => 'assign-permissions', 'description' => 'Can assign permissions', 'organization_id' => 'global'],
         ];
@@ -43,7 +42,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'Administrator',
                 'description' => 'Has full access to the system',
-                'organization_id' => 'global'
+                'organization_id' => 'global',
             ]
         );
 
@@ -52,7 +51,7 @@ class RolePermissionSeeder extends Seeder
             [
                 'name' => 'User',
                 'description' => 'Regular user with basic permissions',
-                'organization_id' => 'global'
+                'organization_id' => 'global',
             ]
         );
 
@@ -62,4 +61,3 @@ class RolePermissionSeeder extends Seeder
         $this->command->info('Global Roles and Permissions seeded successfully!');
     }
 }
-

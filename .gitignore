@@ -65,7 +65,6 @@ coverage.xml
 # Package managers
 package-lock.json
 yarn.lock
-composer.lock
 
 # Misc
 npm-debug.log

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Role extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'organization_id',
         'name',
@@ -104,9 +105,7 @@ class Role extends Model
     /**
      * Assign module access to role.
      *
-     * @param Module|int $module
-     * @param int|null $grantedBy User ID who granted access
-     * @return self
+     * @param  int|null  $grantedBy  User ID who granted access
      */
     public function giveModuleAccess(Module|int $module, ?int $grantedBy = null): self
     {
@@ -117,7 +116,7 @@ class Role extends Model
                 'organization_id' => $this->organization_id,
                 'has_access' => true,
                 'granted_by' => $grantedBy,
-            ]
+            ],
         ]);
 
         return $this;
@@ -125,14 +124,11 @@ class Role extends Model
 
     /**
      * Revoke module access from role.
-     *
-     * @param Module|int $module
-     * @return self
      */
     public function revokeModuleAccess(Module|int $module): self
     {
         $moduleId = $module instanceof Module ? $module->id : $module;
-        
+
         $this->modules()->detach($moduleId);
 
         return $this;
@@ -140,9 +136,6 @@ class Role extends Model
 
     /**
      * Check if role has access to module.
-     *
-     * @param Module|string|int $module
-     * @return bool
      */
     public function hasModuleAccess(Module|string|int $module): bool
     {
@@ -154,7 +147,7 @@ class Role extends Model
         }
 
         $moduleId = $module instanceof Module ? $module->id : $module;
-        
+
         return $this->modules()
             ->where('modules.id', $moduleId)
             ->wherePivot('has_access', true)
@@ -164,9 +157,8 @@ class Role extends Model
     /**
      * Sync modules for this role.
      *
-     * @param array $moduleIds Array of module IDs
-     * @param int|null $grantedBy User ID who granted access
-     * @return self
+     * @param  array  $moduleIds  Array of module IDs
+     * @param  int|null  $grantedBy  User ID who granted access
      */
     public function syncModules(array $moduleIds, ?int $grantedBy = null): self
     {
@@ -186,8 +178,6 @@ class Role extends Model
 
     /**
      * Get all module slugs accessible by this role.
-     *
-     * @return array
      */
     public function getModuleSlugs(): array
     {

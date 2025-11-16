@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PermissionResource;
+use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class PermissionController extends Controller
     public function index(Request $request)
     {
         $permissions = Permission::paginate($request->get('per_page', 15));
+
         return PermissionResource::collection($permissions);
     }
 
@@ -31,25 +33,62 @@ class PermissionController extends Controller
             'organization_id' => 'nullable|string|max:50', // Can be UUID, 'global', or null
         ]);
 
+        // Use organization from context if not explicitly provided in request
+        // If organization_id is explicitly set to null, keep it null (for global permissions)
+        if ($request->has('organization_id')) {
+            $organizationId = $request->input('organization_id');
+        } else {
+            // Try to get organization from middleware context first
+            $organization = $request->attributes->get('organization') ?? (app()->has('organization') ? app('organization') : null);
+
+            // If not set by middleware, try to get from header (manual detection)
+            if (! $organization) {
+                $orgHeaderId = $request->header('X-Organization-ID');
+                if ($orgHeaderId) {
+                    $organization = Organization::where('id', $orgHeaderId)
+                        ->orWhere('slug', $orgHeaderId)
+                        ->first();
+                }
+            }
+
+            $organizationId = $organization ? $organization->id : null;
+        }
+
         // Check if permission already exists with this slug and organization_id
         $existingPermission = Permission::where('slug', $request->slug)
-            ->where('organization_id', $request->organization_id)
+            ->where('organization_id', $organizationId)
             ->first();
 
         if ($existingPermission) {
             return response()->json([
-                'error' => 'A permission with this slug already exists for this tenant'
+                'error' => 'A permission with this slug already exists for this tenant',
             ], 422);
         }
 
-        // Only global admins can create global permissions (organization_id = null or 'global')
-        if ((is_null($request->organization_id) || $request->organization_id === 'global') && !$request->user()->canManageGlobalRoles()) {
-            return response()->json([
-                'error' => 'Only global admins can create global permissions'
-            ], 403);
+        // Authorization checks
+        if (is_null($organizationId) || $organizationId === 'global') {
+            // Creating a global permission - only super admins or global admins can do this
+            if (! $request->user()->canManageGlobalRoles()) {
+                return response()->json([
+                    'error' => 'Only global admins can create global permissions',
+                ], 403);
+            }
+        } else {
+            // Creating an organization-scoped permission - user must be admin in that organization
+            $organization = Organization::findOrFail($organizationId);
+            if (! $request->user()->hasRoleInOrganization('admin', $organization)) {
+                return response()->json([
+                    'error' => 'Only organization admins can create permissions in their organization',
+                ], 403);
+            }
         }
 
-        $permission = Permission::create($request->all());
+        $permission = Permission::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+            'description' => $request->description,
+            'organization_id' => $organizationId,
+        ]);
 
         return new PermissionResource($permission);
     }
@@ -60,6 +99,7 @@ class PermissionController extends Controller
     public function show(string $id)
     {
         $permission = Permission::findOrFail($id);
+
         return new PermissionResource($permission);
     }
 
@@ -86,15 +126,15 @@ class PermissionController extends Controller
 
             if ($existingPermission) {
                 return response()->json([
-                    'error' => 'A permission with this slug already exists for this tenant'
+                    'error' => 'A permission with this slug already exists for this tenant',
                 ], 422);
             }
         }
 
         // Only global admins can update to global permissions (organization_id = null or 'global')
-        if ($request->has('organization_id') && (is_null($request->organization_id) || $request->organization_id === 'global') && !$request->user()->canManageGlobalRoles()) {
+        if ($request->has('organization_id') && (is_null($request->organization_id) || $request->organization_id === 'global') && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
-                'error' => 'Only global admins can create or update global permissions'
+                'error' => 'Only global admins can create or update global permissions',
             ], 403);
         }
 
@@ -112,7 +152,7 @@ class PermissionController extends Controller
         $permission->delete();
 
         return response()->json([
-            'message' => 'Permission deleted successfully'
+            'message' => 'Permission deleted successfully',
         ]);
     }
 
@@ -132,7 +172,7 @@ class PermissionController extends Controller
 
         return response()->json([
             'message' => 'Permission assigned to user successfully',
-            'user' => $user->load('permissions')
+            'user' => $user->load('permissions'),
         ]);
     }
 
@@ -152,8 +192,7 @@ class PermissionController extends Controller
 
         return response()->json([
             'message' => 'Permission removed from user successfully',
-            'user' => $user->load('permissions')
+            'user' => $user->load('permissions'),
         ]);
     }
 }
-

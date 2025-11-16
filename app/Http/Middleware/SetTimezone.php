@@ -39,14 +39,14 @@ class SetTimezone
         }
 
         // Priority 2: User's timezone from profile (if authenticated)
-        if ($request->user() && !empty($request->user()->timezone)) {
+        if ($request->user() && ! empty($request->user()->timezone)) {
             return $request->user()->timezone;
         }
 
         // Priority 3: Organization's timezone (if organization context is set)
         if ($request->attributes->has('organization')) {
             $organization = $request->attributes->get('organization');
-            if (!empty($organization->timezone)) {
+            if (! empty($organization->timezone)) {
                 return $organization->timezone;
             }
         }

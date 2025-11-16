@@ -22,7 +22,7 @@ class ThrottleAuthAttempts
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'error' => 'Too many login attempts. Please try again in ' . $seconds . ' seconds.',
+                'error' => 'Too many login attempts. Please try again in '.$seconds.' seconds.',
                 'retry_after' => $seconds,
             ], 429);
         }
@@ -41,14 +41,11 @@ class ThrottleAuthAttempts
 
     /**
      * Resolve request signature.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
      */
     protected function resolveRequestSignature(Request $request): string
     {
         return sha1(
-            $request->input('email') . '|' . $request->ip()
+            $request->input('email').'|'.$request->ip()
         );
     }
 }

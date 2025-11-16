@@ -15,14 +15,14 @@ class EnableModulesSeeder extends Seeder
     public function run(): void
     {
         $organizations = Organization::all();
-        
+
         // Sample modules to enable for demo
         $moduleSlugs = ['dash', 'rpt', 'cal', 'crm', 'inv', 'proj', 'hr', 'acc', 'sale', 'purch', 'doc', 'chat', 'bi', 'auto', 'api', 'audit', 'payroll'];
-        
+
         $modules = Module::whereIn('slug', $moduleSlugs)->get();
-        
+
         $this->command->info("Enabling {$modules->count()} modules for {$organizations->count()} organizations...");
-        
+
         foreach ($organizations as $org) {
             $enabled = 0;
             foreach ($modules as $module) {
@@ -30,8 +30,8 @@ class EnableModulesSeeder extends Seeder
                     ->where('organization_id', $org->id)
                     ->where('module_id', $module->id)
                     ->exists();
-                
-                if (!$exists) {
+
+                if (! $exists) {
                     DB::table('organization_module')->insert([
                         'organization_id' => $org->id,
                         'module_id' => $module->id,
@@ -45,7 +45,7 @@ class EnableModulesSeeder extends Seeder
             }
             $this->command->info("  ✓ Enabled {$enabled} new modules for {$org->name}");
         }
-        
+
         $this->command->info("\n✅ Modules enabled successfully!");
     }
 }

@@ -11,9 +11,6 @@ class OrganizationUsageController extends Controller
     /**
      * Get comprehensive usage data for an organization.
      * This endpoint is designed for billing service integration.
-     *
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function getUsage(string $organizationId): JsonResponse
     {
@@ -27,9 +24,6 @@ class OrganizationUsageController extends Controller
 
     /**
      * Get active users count for an organization.
-     *
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function getUsersCount(string $organizationId): JsonResponse
     {
@@ -49,9 +43,6 @@ class OrganizationUsageController extends Controller
 
     /**
      * Get enabled modules for an organization.
-     *
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function getModules(string $organizationId): JsonResponse
     {
@@ -83,9 +74,6 @@ class OrganizationUsageController extends Controller
 
     /**
      * Get subscription status for an organization.
-     *
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function getSubscriptionStatus(string $organizationId): JsonResponse
     {
@@ -112,10 +100,6 @@ class OrganizationUsageController extends Controller
     /**
      * Update subscription details from billing service.
      * This endpoint allows the billing service to update subscription status.
-     *
-     * @param Request $request
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function updateSubscription(Request $request, string $organizationId): JsonResponse
     {
@@ -145,10 +129,6 @@ class OrganizationUsageController extends Controller
 
     /**
      * Check if organization can add specified number of users.
-     *
-     * @param Request $request
-     * @param string $organizationId
-     * @return JsonResponse
      */
     public function checkUserLimit(Request $request, string $organizationId): JsonResponse
     {
@@ -167,7 +147,7 @@ class OrganizationUsageController extends Controller
                 'max_users' => $organization->max_users,
                 'requested_count' => $count,
                 'can_add_users' => $organization->canAddUsers($count),
-                'available_slots' => $organization->max_users 
+                'available_slots' => $organization->max_users
                     ? max(0, $organization->max_users - $organization->getActiveUsersCount())
                     : null,
             ],
@@ -177,9 +157,6 @@ class OrganizationUsageController extends Controller
     /**
      * Get bulk usage data for multiple organizations.
      * Useful for billing service to fetch usage for multiple orgs at once.
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function getBulkUsage(Request $request): JsonResponse
     {

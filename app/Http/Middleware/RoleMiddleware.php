@@ -12,32 +12,29 @@ class RoleMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             return response()->json([
-                'message' => 'Unauthenticated.'
+                'message' => 'Unauthenticated.',
             ], 401);
         }
 
-        $organization = $request->attributes->get('organization') ?? app('organization', null);
+        $organization = $request->attributes->get('organization') ?? (app()->has('organization') ? app('organization') : null);
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json([
-                'message' => 'Tenant context is required.'
+                'message' => 'Tenant context is required.',
             ], 400);
         }
 
-        if (!$request->user()->hasAnyRoleInOrganization($roles, $organization)) {
+        if (! $request->user()->hasAnyRoleInOrganization($roles, $organization)) {
             return response()->json([
-                'message' => 'Unauthorized. Required role(s) in this organization: ' . implode(', ', $roles)
+                'message' => 'Unauthorized. Required role(s) in this organization: '.implode(', ', $roles),
             ], 403);
         }
 
         return $next($request);
     }
 }
-
-

@@ -2,16 +2,15 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\ModuleController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\RoleModuleController;
-use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\OrganizationUsageController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -35,7 +34,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/switch-organization', [AuthController::class, 'switchOrganization']);
-    
+
     // User profile management
     Route::get('/me', [UserController::class, 'me']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
@@ -63,12 +62,12 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/{id}', [OrganizationController::class, 'show']);
         Route::put('/{id}', [OrganizationController::class, 'update']);
         Route::delete('/{id}', [OrganizationController::class, 'destroy']);
-        
+
         // Tenant user management
         Route::post('/{id}/add-user', [OrganizationController::class, 'addUser']);
         Route::post('/{id}/remove-user', [OrganizationController::class, 'removeUser']);
         Route::get('/{id}/context', [OrganizationController::class, 'userContext']);
-        
+
         // Organization module management
         Route::get('/{id}/modules', [ModuleController::class, 'getOrganizationModules']);
         Route::post('/{id}/modules/{moduleId}/enable', [ModuleController::class, 'enableForOrganization']);
@@ -82,17 +81,16 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/organizations/{organizationId}/users/count', [OrganizationUsageController::class, 'getUsersCount']);
         Route::get('/organizations/{organizationId}/modules', [OrganizationUsageController::class, 'getModules']);
         Route::get('/organizations/{organizationId}/subscription', [OrganizationUsageController::class, 'getSubscriptionStatus']);
-        
+
         // Update subscription from billing service
         Route::patch('/organizations/{organizationId}/subscription', [OrganizationUsageController::class, 'updateSubscription']);
-        
+
         // Check limits
         Route::post('/organizations/{organizationId}/check-user-limit', [OrganizationUsageController::class, 'checkUserLimit']);
-        
+
         // Bulk operations for efficiency
         Route::post('/organizations/bulk-usage', [OrganizationUsageController::class, 'getBulkUsage']);
     });
-
 
     // Module management routes (global admin only)
     Route::middleware(['role:globaladmin'])->prefix('modules')->group(function () {
@@ -103,31 +101,44 @@ Route::middleware(['auth:api'])->group(function () {
         Route::delete('/{id}', [ModuleController::class, 'destroy']);
     });
 
+    // Global role and permission routes (no organization context, will be handled by controllers)
+    // These routes are checked BEFORE the organization-scoped ones below
+    Route::prefix('roles')->group(function () {
+        // Allow POST to /api/roles for creating global or organization-scoped roles
+        // Controller will determine if organization context is required based on organization_id parameter
+        Route::post('/', [RoleController::class, 'store']);
+        Route::post('/{id}/assign-user', [RoleController::class, 'assignToUser']);
+    });
+
+    Route::prefix('permissions')->group(function () {
+        Route::post('/', [PermissionController::class, 'store']);
+    });
+
     // Team management routes (organization-scoped)
     Route::prefix('teams')->group(function () {
         // List all teams in organization
         Route::get('/', [App\Http\Controllers\Api\TeamController::class, 'index']);
-        
+
         // Get user's teams
         Route::get('/my-teams', [App\Http\Controllers\Api\TeamController::class, 'myTeams']);
-        
+
         // Create team
         Route::post('/', [App\Http\Controllers\Api\TeamController::class, 'store']);
-        
+
         // Get single team
         Route::get('/{id}', [App\Http\Controllers\Api\TeamController::class, 'show']);
-        
+
         // Update team
         Route::put('/{id}', [App\Http\Controllers\Api\TeamController::class, 'update']);
-        
+
         // Delete team
         Route::delete('/{id}', [App\Http\Controllers\Api\TeamController::class, 'destroy']);
-        
+
         // Team member management
         Route::post('/{id}/members', [App\Http\Controllers\Api\TeamController::class, 'addMember']);
         Route::delete('/{id}/members', [App\Http\Controllers\Api\TeamController::class, 'removeMember']);
         Route::patch('/{id}/members/role', [App\Http\Controllers\Api\TeamController::class, 'updateMemberRole']);
-        
+
         // Assign modules to team
         Route::post('/{id}/modules', [App\Http\Controllers\Api\TeamController::class, 'assignModules']);
     });
@@ -143,19 +154,18 @@ Route::middleware(['auth:api'])->group(function () {
         // Role management routes (admin only in tenant)
         Route::middleware(['role:admin'])->prefix('roles')->group(function () {
             Route::get('/', [RoleController::class, 'index']);
-            Route::post('/', [RoleController::class, 'store']);
             Route::get('/{id}', [RoleController::class, 'show']);
             Route::put('/{id}', [RoleController::class, 'update']);
             Route::delete('/{id}', [RoleController::class, 'destroy']);
-            
-            // Assign/remove roles to users
-            Route::post('/{id}/assign-user', [RoleController::class, 'assignToUser']);
+
+            // Assign/remove roles to users - handled above without middleware
+            // Route::post('/{id}/assign-user', [RoleController::class, 'assignToUser']);
             Route::post('/{id}/remove-user', [RoleController::class, 'removeFromUser']);
-            
+
             // Assign/remove permissions to roles
             Route::post('/{id}/assign-permission', [RoleController::class, 'assignPermission']);
             Route::post('/{id}/remove-permission', [RoleController::class, 'removePermission']);
-            
+
             // Role-Module management (hybrid access control)
             Route::get('/{id}/modules', [RoleModuleController::class, 'index']);
             Route::post('/{id}/modules', [RoleModuleController::class, 'assignModules']);
@@ -169,15 +179,13 @@ Route::middleware(['auth:api'])->group(function () {
         // Permission management routes (admin only in tenant)
         Route::middleware(['role:admin'])->prefix('permissions')->group(function () {
             Route::get('/', [PermissionController::class, 'index']);
-            Route::post('/', [PermissionController::class, 'store']);
             Route::get('/{id}', [PermissionController::class, 'show']);
             Route::put('/{id}', [PermissionController::class, 'update']);
             Route::delete('/{id}', [PermissionController::class, 'destroy']);
-            
+
             // Assign/remove permissions directly to users
             Route::post('/{id}/assign-user', [PermissionController::class, 'assignToUser']);
             Route::post('/{id}/remove-user', [PermissionController::class, 'removeFromUser']);
         });
     });
 });
-

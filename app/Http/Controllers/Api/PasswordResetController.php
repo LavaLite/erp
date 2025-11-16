@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 class PasswordResetController extends Controller
 {
@@ -24,7 +23,7 @@ class PasswordResetController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             // Don't reveal if user exists
             return response()->json([
                 'message' => 'If your email is registered, you will receive a password reset link.',
@@ -35,9 +34,9 @@ class PasswordResetController extends Controller
         $token = Password::createToken($user);
 
         // Build reset URL
-        $resetUrl = config('app.frontend_url', config('app.url')) 
-            . '/reset-password?token=' . $token 
-            . '&email=' . urlencode($user->email);
+        $resetUrl = config('app.frontend_url', config('app.url'))
+            .'/reset-password?token='.$token
+            .'&email='.urlencode($user->email);
 
         // Send email
         Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl, $token));
@@ -60,14 +59,14 @@ class PasswordResetController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'error' => 'Invalid password reset token.',
             ], 400);
         }
 
         // Verify token
-        if (!Password::tokenExists($user, $request->token)) {
+        if (! Password::tokenExists($user, $request->token)) {
             return response()->json([
                 'error' => 'Invalid or expired password reset token.',
             ], 400);

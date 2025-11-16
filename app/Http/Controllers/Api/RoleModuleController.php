@@ -7,7 +7,6 @@ use App\Models\Module;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class RoleModuleController extends Controller
 {
@@ -21,7 +20,7 @@ class RoleModuleController extends Controller
         $user = $request->user();
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required in X-Organization-ID header',
@@ -32,7 +31,7 @@ class RoleModuleController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if (!$role) {
+        if (! $role) {
             return response()->json([
                 'success' => false,
                 'message' => 'Role not found in this organization',
@@ -40,7 +39,7 @@ class RoleModuleController extends Controller
         }
 
         // Check if user can manage roles in this organization
-        if (!$user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
+        if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized. Only owners and admins can view role modules.',
@@ -77,7 +76,7 @@ class RoleModuleController extends Controller
         $user = $request->user();
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required in X-Organization-ID header',
@@ -88,7 +87,7 @@ class RoleModuleController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if (!$role) {
+        if (! $role) {
             return response()->json([
                 'success' => false,
                 'message' => 'Role not found in this organization',
@@ -96,7 +95,7 @@ class RoleModuleController extends Controller
         }
 
         // Check if user can manage roles
-        if (!$user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
+        if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized. Only owners and admins can assign modules to roles.',
@@ -116,8 +115,8 @@ class RoleModuleController extends Controller
             ->toArray();
 
         $invalidModules = array_diff($request->module_ids, $orgModuleIds);
-        
-        if (!empty($invalidModules)) {
+
+        if (! empty($invalidModules)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Some modules are not enabled for this organization',
@@ -157,7 +156,7 @@ class RoleModuleController extends Controller
         $user = $request->user();
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required in X-Organization-ID header',
@@ -168,7 +167,7 @@ class RoleModuleController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if (!$role) {
+        if (! $role) {
             return response()->json([
                 'success' => false,
                 'message' => 'Role not found in this organization',
@@ -176,8 +175,8 @@ class RoleModuleController extends Controller
         }
 
         $module = Module::find($moduleId);
-        
-        if (!$module) {
+
+        if (! $module) {
             return response()->json([
                 'success' => false,
                 'message' => 'Module not found',
@@ -185,7 +184,7 @@ class RoleModuleController extends Controller
         }
 
         // Check if user can manage roles
-        if (!$user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
+        if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized. Only owners and admins can manage role modules.',
@@ -199,7 +198,7 @@ class RoleModuleController extends Controller
             ->where('is_enabled', true)
             ->exists();
 
-        if (!$isEnabled) {
+        if (! $isEnabled) {
             return response()->json([
                 'success' => false,
                 'message' => 'Module is not enabled for this organization',
@@ -237,7 +236,7 @@ class RoleModuleController extends Controller
         $user = $request->user();
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required in X-Organization-ID header',
@@ -248,7 +247,7 @@ class RoleModuleController extends Controller
             ->where('organization_id', $organizationId)
             ->first();
 
-        if (!$role) {
+        if (! $role) {
             return response()->json([
                 'success' => false,
                 'message' => 'Role not found in this organization',
@@ -256,8 +255,8 @@ class RoleModuleController extends Controller
         }
 
         $module = Module::find($moduleId);
-        
-        if (!$module) {
+
+        if (! $module) {
             return response()->json([
                 'success' => false,
                 'message' => 'Module not found',
@@ -265,7 +264,7 @@ class RoleModuleController extends Controller
         }
 
         // Check if user can manage roles
-        if (!$user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
+        if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized. Only owners and admins can manage role modules.',
@@ -291,7 +290,7 @@ class RoleModuleController extends Controller
         $user = $request->user();
 
         // Check if user belongs to organization
-        if (!$user->organizations()->where('organizations.id', $organizationId)->exists()) {
+        if (! $user->organizations()->where('organizations.id', $organizationId)->exists()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized. You are not a member of this organization.',

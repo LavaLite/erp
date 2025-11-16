@@ -34,8 +34,8 @@ class UserController extends Controller
                 $query->wherePivot('organization_id', $organizationId);
             }
         }, 'tenants'])
-        ->paginate($request->get('per_page', 15));
-        
+            ->paginate($request->get('per_page', 15));
+
         return UserResource::collection($users);
     }
 
@@ -45,13 +45,13 @@ class UserController extends Controller
     public function show(string $id)
     {
         $user = User::with('roles.permissions', 'permissions')->findOrFail($id);
-        
+
         // Get tenant from JWT token
         $allPermissions = [];
         try {
             $payload = JWTAuth::parseToken()->getPayload();
             $organizationId = $payload->get('organization_id');
-            
+
             if ($organizationId) {
                 $organization = Organization::find($organizationId);
                 if ($organization) {
@@ -61,7 +61,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             // JWT not available or invalid, return empty permissions
         }
-        
+
         return response()->json([
             'user' => new UserResource($user->load('roles', 'organizations')),
             'all_permissions' => $allPermissions,
@@ -74,7 +74,7 @@ class UserController extends Controller
     public function me(Request $request)
     {
         $user = $request->user();
-        
+
         return new UserResource($user->load('roles', 'organizations'));
     }
 
@@ -197,7 +197,7 @@ class UserController extends Controller
 
         $user = $request->user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'error' => 'Current password is incorrect',
             ], 422);
@@ -233,4 +233,3 @@ class UserController extends Controller
         ]);
     }
 }
-

@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * Creates the organizations table with UUID primary key for multi-organization support.
      * Includes subscription and billing fields for SaaS integration, timezone/localization,
      * and organization_user pivot table.
@@ -22,24 +22,24 @@ return new class extends Migration
             $table->string('domain')->unique()->nullable();
             $table->text('description')->nullable();
             $table->json('settings')->nullable();
-            
+
             // Localization and regional settings
             $table->string('timezone')->default('UTC');
             $table->string('country')->nullable();
             $table->string('currency')->default('USD');
-            
+
             $table->boolean('is_active')->default(true);
-            
+
             // Subscription and billing fields
             $table->string('subscription_status')->default('trial');
             $table->integer('max_users')->nullable();
             $table->timestamp('trial_ends_at')->nullable();
             $table->string('subscription_id')->nullable()->unique();
             $table->string('plan_id')->nullable();
-            
+
             $table->timestamps();
             $table->softDeletes();
-            
+
             // Indexes
             $table->index('subscription_status');
             $table->index('subscription_id');
@@ -69,7 +69,7 @@ return new class extends Migration
             $table->json('settings')->nullable(); // Module-specific settings per organization
             $table->json('limits')->nullable(); // Usage limits (e.g., max users, max records)
             $table->timestamps();
-            
+
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
             $table->unique(['organization_id', 'module_id']);
             $table->index(['organization_id', 'is_enabled']);

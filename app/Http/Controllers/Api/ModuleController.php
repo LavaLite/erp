@@ -82,6 +82,7 @@ class ModuleController extends Controller
     public function show($id)
     {
         $module = Module::findOrFail($id);
+
         return new ModuleResource($module);
     }
 
@@ -94,8 +95,8 @@ class ModuleController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|string|max:255',
-            'slug' => 'sometimes|string|unique:modules,slug,' . $id . '|max:255',
-            'code' => 'sometimes|string|unique:modules,code,' . $id . '|max:50',
+            'slug' => 'sometimes|string|unique:modules,slug,'.$id.'|max:255',
+            'code' => 'sometimes|string|unique:modules,code,'.$id.'|max:50',
             'description' => 'nullable|string',
             'icon' => 'nullable|string|max:255',
             'version' => 'nullable|string|max:50',

@@ -20,7 +20,7 @@ class CheckOrganizationLimits
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated',
@@ -28,11 +28,11 @@ class CheckOrganizationLimits
         }
 
         // Get organization from request (assuming it's passed as route parameter or in request)
-        $organizationId = $request->route('organizationId') 
-            ?? $request->route('organization') 
+        $organizationId = $request->route('organizationId')
+            ?? $request->route('organization')
             ?? $request->input('organization_id');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization ID is required',
@@ -41,7 +41,7 @@ class CheckOrganizationLimits
 
         $organization = \App\Models\Organization::find($organizationId);
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization not found',
@@ -49,7 +49,7 @@ class CheckOrganizationLimits
         }
 
         // Check if organization has active subscription
-        if (!$organization->hasActiveSubscription()) {
+        if (! $organization->hasActiveSubscription()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Organization subscription is not active. Please contact support or update your subscription.',
@@ -69,8 +69,8 @@ class CheckOrganizationLimits
         // For requests that add users, check user limits
         if ($this->isUserAdditionRequest($request)) {
             $count = $request->input('count', 1);
-            
-            if (!$organization->canAddUsers($count)) {
+
+            if (! $organization->canAddUsers($count)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'User limit reached. Please upgrade your plan to add more users.',
@@ -89,15 +89,12 @@ class CheckOrganizationLimits
 
     /**
      * Check if the request is attempting to add users.
-     *
-     * @param Request $request
-     * @return bool
      */
     private function isUserAdditionRequest(Request $request): bool
     {
         $route = $request->route();
-        
-        if (!$route) {
+
+        if (! $route) {
             return false;
         }
 
@@ -105,11 +102,11 @@ class CheckOrganizationLimits
         $uri = $request->path();
 
         // Check if the request is for adding users
-        return ($request->isMethod('POST') && (
+        return $request->isMethod('POST') && (
             str_contains($uri, '/users') ||
             str_contains($action, 'addUser') ||
             str_contains($action, 'createUser') ||
             str_contains($action, 'inviteUser')
-        ));
+        );
     }
 }

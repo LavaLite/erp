@@ -19,7 +19,7 @@ class TeamController extends Controller
     {
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json(['error' => 'Organization context required (X-Organization-ID header)'], 400);
         }
 
@@ -42,7 +42,7 @@ class TeamController extends Controller
         $user = Auth::user();
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json(['error' => 'Organization context required (X-Organization-ID header)'], 400);
         }
 
@@ -73,7 +73,7 @@ class TeamController extends Controller
     {
         $organizationId = $request->header('X-Organization-ID');
 
-        if (!$organizationId) {
+        if (! $organizationId) {
             return response()->json(['error' => 'Organization context required (X-Organization-ID header)'], 400);
         }
 
@@ -87,7 +87,7 @@ class TeamController extends Controller
         ]);
 
         // Auto-generate slug if not provided
-        if (!isset($validated['slug'])) {
+        if (! isset($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['name']);
         }
 
@@ -98,7 +98,7 @@ class TeamController extends Controller
 
         if ($existingTeam) {
             return response()->json([
-                'error' => 'A team with this slug already exists in your organization'
+                'error' => 'A team with this slug already exists in your organization',
             ], 422);
         }
 
@@ -128,7 +128,7 @@ class TeamController extends Controller
 
         // Check if user has access to this team's organization
         $user = Auth::user();
-        if (!$user->belongsToOrganization($team->organization_id)) {
+        if (! $user->belongsToOrganization($team->organization_id)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -144,7 +144,7 @@ class TeamController extends Controller
 
         // Check if user is team leader or org admin
         $user = Auth::user();
-        if (!$user->isTeamLeader($team) && !$user->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $user->isTeamLeader($team) && ! $user->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only team leaders can update the team'], 403);
         }
 
@@ -166,7 +166,7 @@ class TeamController extends Controller
 
             if ($existingTeam) {
                 return response()->json([
-                    'error' => 'A team with this slug already exists in your organization'
+                    'error' => 'A team with this slug already exists in your organization',
                 ], 422);
             }
         }
@@ -188,14 +188,14 @@ class TeamController extends Controller
 
         // Check if user is org admin
         $user = Auth::user();
-        if (!$user->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $user->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only organization admins can delete teams'], 403);
         }
 
         // Check if team has sub-teams
         if ($team->subTeams()->count() > 0) {
             return response()->json([
-                'error' => 'Cannot delete team with sub-teams. Delete or reassign sub-teams first.'
+                'error' => 'Cannot delete team with sub-teams. Delete or reassign sub-teams first.',
             ], 422);
         }
 
@@ -218,14 +218,14 @@ class TeamController extends Controller
 
         // Check if requester is team leader or org admin
         $requester = Auth::user();
-        if (!$requester->isTeamLeader($team) && !$requester->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $requester->isTeamLeader($team) && ! $requester->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only team leaders can add members'], 403);
         }
 
         $user = User::findOrFail($validated['user_id']);
 
         // Check if user belongs to the organization
-        if (!$user->belongsToOrganization($team->organization_id)) {
+        if (! $user->belongsToOrganization($team->organization_id)) {
             return response()->json(['error' => 'User is not a member of this organization'], 422);
         }
 
@@ -255,7 +255,7 @@ class TeamController extends Controller
 
         // Check if requester is team leader or org admin
         $requester = Auth::user();
-        if (!$requester->isTeamLeader($team) && !$requester->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $requester->isTeamLeader($team) && ! $requester->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only team leaders can remove members'], 403);
         }
 
@@ -288,22 +288,22 @@ class TeamController extends Controller
 
         // Check if requester is team leader or org admin
         $requester = Auth::user();
-        if (!$requester->isTeamLeader($team) && !$requester->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $requester->isTeamLeader($team) && ! $requester->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only team leaders can update member roles'], 403);
         }
 
         $user = User::findOrFail($validated['user_id']);
 
         // Check if user is a team member
-        if (!$team->hasMember($user)) {
+        if (! $team->hasMember($user)) {
             return response()->json(['error' => 'User is not a member of this team'], 422);
         }
 
         // Prevent demoting the last leader (owner/admin/manager)
         $isCurrentlyLeader = $user->isTeamLeader($team);
         $isNewRoleLeader = in_array($validated['role'], ['owner', 'admin', 'manager']);
-        
-        if ($isCurrentlyLeader && !$isNewRoleLeader && $team->leadershipTeam()->count() <= 1) {
+
+        if ($isCurrentlyLeader && ! $isNewRoleLeader && $team->leadershipTeam()->count() <= 1) {
             return response()->json(['error' => 'Cannot demote the last team leader'], 422);
         }
 
@@ -329,7 +329,7 @@ class TeamController extends Controller
 
         // Check if requester is org admin
         $requester = Auth::user();
-        if (!$requester->hasRoleInOrganization('admin', $team->organization_id)) {
+        if (! $requester->hasRoleInOrganization('admin', $team->organization_id)) {
             return response()->json(['error' => 'Only organization admins can assign modules'], 403);
         }
 

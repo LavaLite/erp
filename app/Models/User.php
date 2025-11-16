@@ -16,7 +16,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasMultiOrganizationRolesAndPermissions, SoftDeletes;
+    use HasApiTokens, HasFactory, HasMultiOrganizationRolesAndPermissions, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -89,8 +89,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get the user's full name.
-     *
-     * @return string
      */
     public function getFullNameAttribute(): string
     {
@@ -99,19 +97,14 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get the user's initials.
-     *
-     * @return string
      */
     public function getInitialsAttribute(): string
     {
-        return strtoupper(substr($this->first_name, 0, 1) . substr($this->last_name, 0, 1));
+        return strtoupper(substr($this->first_name, 0, 1).substr($this->last_name, 0, 1));
     }
 
     /**
      * Update last login information.
-     *
-     * @param string|null $ip
-     * @return void
      */
     public function updateLastLogin(?string $ip = null): void
     {
@@ -123,8 +116,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Check if the user is a super admin.
-     *
-     * @return bool
      */
     public function isSuperAdmin(): bool
     {
@@ -133,8 +124,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Check if the user has the global admin role.
-     *
-     * @return bool
      */
     public function isGlobalAdmin(): bool
     {
@@ -147,18 +136,15 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Check if the user can manage global roles and permissions.
-     * Only users with global admin role can manage global roles/permissions.
-     * Super admins are explicitly excluded from managing global resources.
-     *
-     * @return bool
+     * Super admins and users with global admin role can manage global roles/permissions.
      */
     public function canManageGlobalRoles(): bool
     {
-        // Super admins cannot manage global roles - they only have organization-level access
+        // Super admins can manage global roles
         if ($this->isSuperAdmin()) {
-            return false;
+            return true;
         }
-        
+
         return $this->isGlobalAdmin();
     }
 
@@ -238,6 +224,7 @@ class User extends Authenticatable implements JWTSubject
     public function belongsToTeam(Team|int $team): bool
     {
         $teamId = $team instanceof Team ? $team->id : $team;
+
         return $this->teams()->where('team_id', $teamId)->exists();
     }
 
@@ -247,6 +234,7 @@ class User extends Authenticatable implements JWTSubject
     public function isTeamLeader(Team|int $team): bool
     {
         $teamId = $team instanceof Team ? $team->id : $team;
+
         return $this->teams()
             ->where('team_id', $teamId)
             ->whereIn('team_user.role', ['owner', 'admin', 'manager'])
@@ -259,6 +247,7 @@ class User extends Authenticatable implements JWTSubject
     public function isTeamOwner(Team|int $team): bool
     {
         $teamId = $team instanceof Team ? $team->id : $team;
+
         return $this->teams()
             ->where('team_id', $teamId)
             ->wherePivot('role', 'owner')
@@ -282,7 +271,7 @@ class User extends Authenticatable implements JWTSubject
         $membership = $this->teams()
             ->where('team_id', $teamId)
             ->first();
-        
+
         return $membership?->pivot->role;
     }
 
@@ -294,7 +283,7 @@ class User extends Authenticatable implements JWTSubject
      * Get all accessible module slugs for user in an organization.
      * Hybrid approach: Team-based + Role-based fallback.
      *
-     * @param int|string $organizationId
+     * @param  int|string  $organizationId
      * @return array Array of module slugs
      */
     public function getAccessibleModules($organizationId): array
@@ -335,7 +324,7 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Get modules from user's teams in organization.
      *
-     * @param int|string $organizationId
+     * @param  int|string  $organizationId
      * @return array Array of module slugs
      */
     public function getModulesFromTeams($organizationId): array
@@ -355,7 +344,7 @@ class User extends Authenticatable implements JWTSubject
                     ->pluck('slug')
                     ->toArray() ?? [];
             }
-            
+
             // Add team's assigned modules
             $teamModuleIds = $team->modules()->pluck('modules.id')->toArray();
             $moduleIds = array_merge($moduleIds, $teamModuleIds);
@@ -374,7 +363,7 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Get modules from user's roles in organization.
      *
-     * @param int|string $organizationId
+     * @param  int|string  $organizationId
      * @return array Array of module slugs
      */
     public function getModulesFromRoles($organizationId): array
@@ -394,7 +383,7 @@ class User extends Authenticatable implements JWTSubject
                 ->where('has_access', true)
                 ->pluck('module_id')
                 ->toArray();
-            
+
             $moduleIds = array_merge($moduleIds, $roleModuleIds);
         }
 
@@ -411,27 +400,25 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Check if user can access a specific module in organization.
      *
-     * @param string $moduleSlug
-     * @param int|string $organizationId
-     * @return bool
+     * @param  int|string  $organizationId
      */
     public function canAccessModule(string $moduleSlug, $organizationId): bool
     {
         $accessibleModules = $this->getAccessibleModules($organizationId);
+
         return in_array($moduleSlug, $accessibleModules);
     }
 
     /**
      * Check if user has role in organization.
      *
-     * @param string|array $roleNames
-     * @param int|string $organizationId
-     * @return bool
+     * @param  string|array  $roleNames
+     * @param  int|string  $organizationId
      */
     public function hasRoleInOrganization($roleNames, $organizationId): bool
     {
         $roleNames = is_array($roleNames) ? $roleNames : [$roleNames];
-        
+
         return $this->rolesInOrganization($organizationId)
             ->whereIn('name', $roleNames)
             ->exists();
@@ -439,13 +426,11 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Generate email verification token.
-     *
-     * @return string
      */
     public function generateEmailVerificationToken(): string
     {
         $token = bin2hex(random_bytes(32));
-        
+
         $this->update([
             'email_verification_token' => hash('sha256', $token),
             'email_verification_sent_at' => now(),
@@ -456,9 +441,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Verify email with token.
-     *
-     * @param string $token
-     * @return bool
      */
     public function verifyEmail(string $token): bool
     {
@@ -487,20 +469,14 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Check if email is verified.
-     *
-     * @return bool
      */
     public function hasVerifiedEmail(): bool
     {
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     /**
      * Enable two-factor authentication.
-     *
-     * @param string $secret
-     * @param array $recoveryCodes
-     * @return void
      */
     public function enableTwoFactor(string $secret, array $recoveryCodes): void
     {
@@ -513,8 +489,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Disable two-factor authentication.
-     *
-     * @return void
      */
     public function disableTwoFactor(): void
     {
@@ -527,8 +501,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get two-factor secret.
-     *
-     * @return string|null
      */
     public function getTwoFactorSecret(): ?string
     {
@@ -537,12 +509,10 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get two-factor recovery codes.
-     *
-     * @return array
      */
     public function getTwoFactorRecoveryCodes(): array
     {
-        if (!$this->two_factor_recovery_codes) {
+        if (! $this->two_factor_recovery_codes) {
             return [];
         }
 
@@ -551,24 +521,20 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Use a recovery code.
-     *
-     * @param string $code
-     * @return bool
      */
     public function useRecoveryCode(string $code): bool
     {
         $codes = $this->getTwoFactorRecoveryCodes();
-        
-        if (!in_array($code, $codes)) {
+
+        if (! in_array($code, $codes)) {
             return false;
         }
 
         $codes = array_values(array_diff($codes, [$code]));
-        
+
         $this->two_factor_recovery_codes = encrypt(json_encode($codes));
         $this->save();
 
         return true;
     }
 }
-

@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserModelTest extends TestCase
@@ -56,7 +55,7 @@ class UserModelTest extends TestCase
     public function test_user_can_enable_two_factor(): void
     {
         $user = User::factory()->create();
-        
+
         $user->enableTwoFactor('TESTSECRET', ['code1', 'code2', 'code3']);
 
         $this->assertTrue($user->fresh()->two_factor_enabled);

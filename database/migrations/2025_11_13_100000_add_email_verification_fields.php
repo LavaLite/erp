@@ -13,10 +13,10 @@ return new class extends Migration
     {
         // Add email verification token to users table if not exists
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'email_verification_token')) {
+            if (! Schema::hasColumn('users', 'email_verification_token')) {
                 $table->string('email_verification_token', 100)->nullable()->after('email_verified_at');
             }
-            if (!Schema::hasColumn('users', 'email_verification_sent_at')) {
+            if (! Schema::hasColumn('users', 'email_verification_sent_at')) {
                 $table->timestamp('email_verification_sent_at')->nullable()->after('email_verification_token');
             }
         });

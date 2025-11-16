@@ -17,20 +17,21 @@ class SetOrganizationContext
     public function handle(Request $request, Closure $next): Response
     {
         // Get tenant from header, subdomain, or request parameter
-        $organizationId = $request->header('X-Organization-ID') 
+        $organizationId = $request->header('X-Organization-ID')
             ?? $request->input('organization_id')
             ?? $this->getTenantFromSubdomain($request);
 
         if ($organizationId) {
-            $organization = is_numeric($organizationId) 
-                ? Organization::find($organizationId) 
-                : Organization::where('slug', $organizationId)->first();
+            // Try to find organization by ID (UUID or int) or slug
+            $organization = Organization::where('id', $organizationId)
+                ->orWhere('slug', $organizationId)
+                ->first();
 
             if ($organization && $organization->is_active) {
                 // Check if user belongs to this tenant
-                if ($request->user() && !$request->user()->belongsToOrganization($organization)) {
+                if ($request->user() && ! $request->user()->belongsToOrganization($organization)) {
                     return response()->json([
-                        'message' => 'You do not have access to this tenant.'
+                        'message' => 'You do not have access to this tenant.',
                     ], 403);
                 }
 
@@ -39,7 +40,7 @@ class SetOrganizationContext
                 app()->instance('organization', $organization);
             } else {
                 return response()->json([
-                    'message' => 'Invalid or inactive tenant.'
+                    'message' => 'Invalid or inactive tenant.',
                 ], 404);
             }
         }
@@ -63,4 +64,3 @@ class SetOrganizationContext
         return null;
     }
 }
-

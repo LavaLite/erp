@@ -22,29 +22,29 @@ class CheckUserLimit
     public function handle(Request $request, Closure $next): Response
     {
         // Only check on user creation/invitation endpoints
-        if (!$this->isUserCreationRequest($request)) {
+        if (! $this->isUserCreationRequest($request)) {
             return $next($request);
         }
 
         try {
             // Parse JWT token and get payload
             $payload = JWTAuth::parseToken()->getPayload();
-            
+
             // Get max users and organization ID from JWT
             $maxUsers = $payload->get('max_users', 10);
             $organizationId = $payload->get('organization_id');
-            
-            if (!$organizationId) {
+
+            if (! $organizationId) {
                 return $next($request);
             }
-            
+
             // Count current active users in the organization
             $currentUserCount = DB::table('organization_user')
                 ->join('users', 'organization_user.user_id', '=', 'users.id')
                 ->where('organization_user.organization_id', $organizationId)
                 ->whereNull('users.deleted_at')
                 ->count();
-            
+
             // Check if limit would be exceeded
             if ($currentUserCount >= $maxUsers) {
                 return response()->json([
@@ -55,16 +55,16 @@ class CheckUserLimit
                     'can_add' => false,
                 ], 403);
             }
-            
+
             // Add user count info to request for use in controller
             $request->merge([
                 '_current_user_count' => $currentUserCount,
                 '_max_users' => $maxUsers,
                 '_users_remaining' => $maxUsers - $currentUserCount,
             ]);
-            
+
             return $next($request);
-            
+
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 'success' => false,
@@ -90,13 +90,13 @@ class CheckUserLimit
     {
         $method = $request->method();
         $path = $request->path();
-        
+
         // Check for user creation/invitation endpoints
-        return ($method === 'POST' && (
+        return $method === 'POST' && (
             str_contains($path, '/users') ||
             str_contains($path, '/add-user') ||
             str_contains($path, '/invite') ||
             str_contains($path, '/register')
-        ));
+        );
     }
 }

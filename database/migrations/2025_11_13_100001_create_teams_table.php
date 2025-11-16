@@ -29,7 +29,7 @@ return new class extends Migration
 
             // Foreign key constraint for organization_id
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
-            
+
             // Unique constraint: slug per organization
             $table->unique(['organization_id', 'slug']);
         });

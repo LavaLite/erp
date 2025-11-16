@@ -30,7 +30,7 @@ class OrganizationModelTest extends TestCase
     public function test_organization_can_check_user_limit(): void
     {
         $org = Organization::factory()->create(['max_users' => 5]);
-        
+
         for ($i = 0; $i < 3; $i++) {
             $user = User::factory()->create();
             $org->users()->attach($user->id);

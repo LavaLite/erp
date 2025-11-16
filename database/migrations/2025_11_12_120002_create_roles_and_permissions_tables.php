@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * 
+     *
      * Creates roles and permissions tables with organization-scoping support.
      * Includes all pivot tables for RBAC functionality.
      */

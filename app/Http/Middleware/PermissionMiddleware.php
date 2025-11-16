@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -11,7 +12,6 @@ class PermissionMiddleware
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$permissions
      */
     public function handle(Request $request, Closure $next, string ...$permissions): Response
     {
@@ -23,15 +23,15 @@ class PermissionMiddleware
 
         $organization = $request->attributes->get('organization') ?? app('organization');
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json([
                 'message' => 'Tenant context is required.',
             ], 400);
         }
 
-        if (!$request->user()->hasAnyPermissionInTenant($permissions, $organization)) {
+        if (! $request->user()->hasAnyPermissionInTenant($permissions, $organization)) {
             return response()->json([
-                'message' => 'Unauthorized. Required permission(s) in this tenant: ' . implode(', ', $permissions),
+                'message' => 'Unauthorized. Required permission(s) in this tenant: '.implode(', ', $permissions),
             ], 403);
         }
 

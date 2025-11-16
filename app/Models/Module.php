@@ -41,7 +41,7 @@ class Module extends Model
                 'enabled_at',
                 'expires_at',
                 'settings',
-                'limits'
+                'limits',
             ])
             ->withTimestamps();
     }
@@ -83,7 +83,7 @@ class Module extends Model
      */
     public function hasDependencies(): bool
     {
-        return !empty($this->dependencies);
+        return ! empty($this->dependencies);
     }
 
     /**
@@ -91,7 +91,7 @@ class Module extends Model
      */
     public function getDependentModules()
     {
-        if (!$this->hasDependencies()) {
+        if (! $this->hasDependencies()) {
             return collect([]);
         }
 

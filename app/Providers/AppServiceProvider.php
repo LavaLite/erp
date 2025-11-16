@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Configure Carbon to serialize dates in ISO 8601 format with timezone
         \Illuminate\Support\Facades\Date::use(\Carbon\CarbonImmutable::class);
-        
+
         // Set JSON serialization format for all Carbon dates
         \Carbon\Carbon::serializeUsing(function ($carbon) {
             return $carbon->toIso8601String();

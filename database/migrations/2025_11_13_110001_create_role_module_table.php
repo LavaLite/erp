@@ -22,10 +22,10 @@ return new class extends Migration
 
             // Foreign key constraint for organization_id
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
-            
+
             // Prevent duplicate role-module assignments per organization
             $table->unique(['role_id', 'module_id', 'organization_id'], 'role_module_org_unique');
-            
+
             // Indexes for performance
             $table->index(['role_id', 'organization_id']);
             $table->index(['module_id', 'organization_id']);

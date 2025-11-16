@@ -23,10 +23,10 @@ class CheckSubscriptionStatus
         try {
             // Parse JWT token and get payload
             $payload = JWTAuth::parseToken()->getPayload();
-            
+
             // Get subscription status from JWT claims
             $subscriptionStatus = $payload->get('subscription_status', 'active');
-            
+
             // Check if subscription is active
             if ($subscriptionStatus === 'suspended') {
                 return response()->json([
@@ -35,7 +35,7 @@ class CheckSubscriptionStatus
                     'subscription_status' => 'suspended',
                 ], 403);
             }
-            
+
             if ($subscriptionStatus === 'cancelled') {
                 return response()->json([
                     'success' => false,
@@ -43,17 +43,18 @@ class CheckSubscriptionStatus
                     'subscription_status' => 'cancelled',
                 ], 403);
             }
-            
+
             // For trial status, allow access but add warning header
             if ($subscriptionStatus === 'trial') {
                 $response = $next($request);
                 $response->headers->set('X-Subscription-Status', 'trial');
+
                 return $response;
             }
-            
+
             // Subscription is active, proceed
             return $next($request);
-            
+
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
                 'success' => false,

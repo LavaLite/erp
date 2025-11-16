@@ -27,6 +27,7 @@ class RoleModuleSeeder extends Seeder
 
         if ($organizations->isEmpty()) {
             $this->command->warn('No organizations found. Please run DatabaseSeeder first.');
+
             return;
         }
 
@@ -45,6 +46,7 @@ class RoleModuleSeeder extends Seeder
 
             if (empty($enabledModuleIds)) {
                 $this->command->warn("  No enabled modules for {$organization->name}");
+
                 continue;
             }
 
@@ -84,19 +86,19 @@ class RoleModuleSeeder extends Seeder
                     case 'administrator':
                         // Admins: All enabled modules
                         $assignedModules = $enabledModuleIds;
-                        $this->command->info("  ✓ {$role->name}: " . count($assignedModules) . " modules (all)");
+                        $this->command->info("  ✓ {$role->name}: ".count($assignedModules).' modules (all)');
                         break;
 
                     case 'user admin':
                         // User Admins: Basic + operational + management modules
                         $assignedModules = array_merge($basicModules, $operationalModules, $managementModules);
-                        $this->command->info("  ✓ {$role->name}: " . count($assignedModules) . " modules (up to management)");
+                        $this->command->info("  ✓ {$role->name}: ".count($assignedModules).' modules (up to management)');
                         break;
 
                     case 'user':
                         // Users: Basic + operational modules
                         $assignedModules = array_merge($basicModules, $operationalModules);
-                        $this->command->info("  ✓ {$role->name}: " . count($assignedModules) . " modules (basic + operational)");
+                        $this->command->info("  ✓ {$role->name}: ".count($assignedModules).' modules (basic + operational)');
                         break;
 
                     case 'client':
@@ -104,18 +106,18 @@ class RoleModuleSeeder extends Seeder
                         // Clients/Viewers: Only basic modules (read-only access)
                         // Clients/Viewers: Only basic modules (read-only access)
                         $assignedModules = $basicModules;
-                        $this->command->info("  ✓ {$role->name}: " . count($assignedModules) . " basic modules");
+                        $this->command->info("  ✓ {$role->name}: ".count($assignedModules).' basic modules');
                         break;
 
                     default:
                         // Custom roles: Give basic modules by default
                         $assignedModules = $basicModules;
-                        $this->command->info("  ✓ {$role->name} (custom): " . count($assignedModules) . " basic modules");
+                        $this->command->info("  ✓ {$role->name} (custom): ".count($assignedModules).' basic modules');
                         break;
                 }
 
                 // Assign modules to role
-                if (!empty($assignedModules)) {
+                if (! empty($assignedModules)) {
                     $syncData = [];
                     foreach ($assignedModules as $moduleId) {
                         $syncData[$moduleId] = [
@@ -133,10 +135,10 @@ class RoleModuleSeeder extends Seeder
         }
 
         $this->command->info("\n✅ Role-module access control configured successfully!");
-        $this->command->info("📝 Summary:");
-        $this->command->info("   - Clients: Basic modules only (Dashboard, Reports, Calendar)");
-        $this->command->info("   - Users: Basic + Operational (CRM, Inventory, Projects, etc.)");
-        $this->command->info("   - User Admins: Users + Management (HR, Accounting, Sales, etc.)");
-        $this->command->info("   - Administrators: All enabled modules");
+        $this->command->info('📝 Summary:');
+        $this->command->info('   - Clients: Basic modules only (Dashboard, Reports, Calendar)');
+        $this->command->info('   - Users: Basic + Operational (CRM, Inventory, Projects, etc.)');
+        $this->command->info('   - User Admins: Users + Management (HR, Accounting, Sales, etc.)');
+        $this->command->info('   - Administrators: All enabled modules');
     }
 }
