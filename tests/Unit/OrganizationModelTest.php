@@ -18,7 +18,11 @@ class OrganizationModelTest extends TestCase
         $user2 = User::factory()->create(['is_active' => true]);
         $user3 = User::factory()->create(['is_active' => false]);
 
-        $org->users()->attach([$user1->id, $user2->id, $user3->id]);
+        $org->users()->attach([
+            $user1->id => ['is_active' => true],
+            $user2->id => ['is_active' => true],
+            $user3->id => ['is_active' => false],
+        ]);
 
         $this->assertEquals(2, $org->getActiveUsersCount());
     }

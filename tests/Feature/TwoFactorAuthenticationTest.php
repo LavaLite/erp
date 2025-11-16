@@ -15,7 +15,7 @@ class TwoFactorAuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->withSession([])->actingAsUser($user)
             ->postJson('/api/2fa/enable');
 
         $response->assertStatus(200)
@@ -32,7 +32,7 @@ class TwoFactorAuthenticationTest extends TestCase
         $user = User::factory()->create();
         $user->enableTwoFactor('TESTSECRET', ['code1', 'code2']);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/2fa/enable');
 
         $response->assertStatus(400)
@@ -48,7 +48,7 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
         $user->enableTwoFactor('TESTSECRET', ['code1', 'code2']);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/2fa/disable', [
                 'password' => 'password',
             ]);
@@ -69,7 +69,7 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
         $user->enableTwoFactor('TESTSECRET', ['code1', 'code2']);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/2fa/disable', [
                 'password' => 'wrongpassword',
             ]);
@@ -90,7 +90,7 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
         $user->enableTwoFactor('TESTSECRET', ['code1', 'code2']);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/2fa/recovery-codes', [
                 'password' => 'password',
             ]);

@@ -106,10 +106,8 @@ class AuthenticationTest extends TestCase
         }
 
         $response->assertStatus(429)
-            ->assertJson([
-                'error' => function ($message) {
-                    return str_contains($message, 'Too many login attempts');
-                },
+            ->assertJsonFragment([
+                'error' => 'Too many login attempts. Please try again in 60 seconds.',
             ]);
     }
 
@@ -117,7 +115,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/logout');
 
         $response->assertStatus(200)
@@ -130,13 +128,15 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->getJson('/api/me');
 
         $response->assertStatus(200)
             ->assertJson([
-                'id' => $user->id,
-                'email' => $user->email,
+                'data' => [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                ],
             ]);
     }
 }

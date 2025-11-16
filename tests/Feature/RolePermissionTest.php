@@ -26,7 +26,7 @@ class RolePermissionTest extends TestCase
         ]);
         $user->roles()->attach($adminRole->id, ['organization_id' => $org->id]);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user, ['organization_id' => $org->id])
             ->withHeader('X-Organization-ID', $org->id)
             ->postJson('/api/roles', [
                 'name' => 'Manager',
@@ -69,7 +69,7 @@ class RolePermissionTest extends TestCase
         
         $admin->roles()->attach($adminRole->id, ['organization_id' => $org->id]);
 
-        $response = $this->actingAs($admin, 'sanctum')
+        $response = $this->actingAsUser($admin, ['organization_id' => $org->id])
             ->withHeader('X-Organization-ID', $org->id)
             ->postJson("/api/roles/{$managerRole->id}/assign-user", [
                 'user_id' => $user->id,
@@ -92,7 +92,7 @@ class RolePermissionTest extends TestCase
         ]);
         $user->roles()->attach($adminRole->id, ['organization_id' => $org->id]);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user, ['organization_id' => $org->id])
             ->withHeader('X-Organization-ID', $org->id)
             ->postJson('/api/permissions', [
                 'name' => 'Edit Posts',
@@ -113,7 +113,7 @@ class RolePermissionTest extends TestCase
     {
         $superAdmin = User::factory()->create(['is_super_admin' => true]);
 
-        $response = $this->actingAs($superAdmin, 'sanctum')
+        $response = $this->actingAsUser($superAdmin)
             ->postJson('/api/roles', [
                 'name' => 'Global Admin',
                 'slug' => 'global-admin',
@@ -136,7 +136,7 @@ class RolePermissionTest extends TestCase
         $org = Organization::factory()->create();
         $user->organizations()->attach($org->id);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user, ['organization_id' => $org->id])
             ->postJson('/api/roles', [
                 'name' => 'Global Admin',
                 'slug' => 'global-admin',

@@ -17,7 +17,7 @@ class OrganizationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->postJson('/api/organizations', [
                 'name' => 'Test Organization',
                 'slug' => 'test-org',
@@ -26,10 +26,12 @@ class OrganizationTest extends TestCase
 
         $response->assertStatus(201)
             ->assertJsonStructure([
-                'id',
-                'name',
-                'slug',
-                'description',
+                'data' => [
+                    'id',
+                    'name',
+                    'slug',
+                    'description',
+                ],
             ]);
 
         $this->assertDatabaseHas('organizations', [
@@ -44,7 +46,7 @@ class OrganizationTest extends TestCase
         $org = Organization::factory()->create();
         $user->organizations()->attach($org->id);
 
-        $response = $this->actingAs($user, 'sanctum')
+        $response = $this->actingAsUser($user)
             ->getJson('/api/organizations');
 
         $response->assertStatus(200)
@@ -59,7 +61,7 @@ class OrganizationTest extends TestCase
         
         $owner->organizations()->attach($org->id);
 
-        $response = $this->actingAs($owner, 'sanctum')
+        $response = $this->actingAsUser($owner, ['organization_id' => $org->id])
             ->postJson("/api/organizations/{$org->id}/add-user", [
                 'user_id' => $newUser->id,
             ]);
