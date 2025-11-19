@@ -288,21 +288,7 @@
     </footer>
 
     <script>
-        // Load user info from localStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const userData = localStorage.getItem('user_data');
-            if (userData) {
-                try {
-                    const user = JSON.parse(userData);
-                    document.getElementById('user-name').textContent = user.first_name || user.name || 'User';
-                } catch (e) {
-                    console.error('Error parsing user data:', e);
-                }
-            } else {
-                // If no user data, redirect to login
-                window.location.href = '/login';
-            }
-        });
+       
 
         function logout() {
             const token = localStorage.getItem('auth_token');

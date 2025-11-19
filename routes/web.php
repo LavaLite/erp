@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,6 +29,12 @@ Route::get('/reset-password/{token}', function ($token) {
 // Login submission (web)
 Route::post('/login', [\App\Http\Controllers\Web\AuthController::class, 'login'])
     ->name('login.submit');
+
+// Social login routes
+Route::get('/auth/{provider}/redirect', [\App\Http\Controllers\Web\SocialAuthController::class, 'redirect'])
+    ->name('social.redirect');
+Route::get('/auth/{provider}/callback', [\App\Http\Controllers\Web\SocialAuthController::class, 'callback'])
+    ->name('social.callback');
 
 // Email verification route (GET for clicking links in emails)
 Route::get('/verify-email', [EmailVerificationController::class, 'verifyViaGet'])

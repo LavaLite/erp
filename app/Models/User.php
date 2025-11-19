@@ -57,7 +57,6 @@ class User extends Authenticatable implements JWTSubject
      * @var list<string>
      */
     protected $fillable = [
-        'id',
         'first_name',
         'last_name',
         'email',
@@ -78,12 +77,15 @@ class User extends Authenticatable implements JWTSubject
         'preferences',
         'is_active',
         'is_super_admin',
+        'two_factor_enabled',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
         'last_login_at',
         'last_login_ip',
         'email_verification_token',
         'email_verification_sent_at',
-        'two_factor_enabled',
-        'two_factor_confirmed_at',
+        'social_accounts',
     ];
 
     /**
@@ -108,16 +110,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'email_verified_at' => 'datetime',
-            'email_verification_sent_at' => 'datetime',
             'password' => 'hashed',
-            'date_of_birth' => 'date',
-            'preferences' => 'array',
-            'is_active' => 'boolean',
-            'is_super_admin' => 'boolean',
-            'two_factor_enabled' => 'boolean',
             'two_factor_confirmed_at' => 'datetime',
             'last_login_at' => 'datetime',
-            'deleted_at' => 'datetime',
+            'email_verification_sent_at' => 'datetime',
+            'social_accounts' => 'array',
         ];
     }
 
@@ -146,6 +143,42 @@ class User extends Authenticatable implements JWTSubject
             'last_login_at' => now(),
             'last_login_ip' => $ip,
         ]);
+    }
+
+    /**
+     * Check if user has a specific social account linked.
+     */
+    public function hasSocialAccount(string $provider): bool
+    {
+        return isset($this->social_accounts[$provider]);
+    }
+
+    /**
+     * Get social account ID for a specific provider.
+     */
+    public function getSocialAccountId(string $provider): ?string
+    {
+        return $this->social_accounts[$provider] ?? null;
+    }
+
+    /**
+     * Link a social account to this user.
+     */
+    public function linkSocialAccount(string $provider, string $providerId): void
+    {
+        $socialAccounts = $this->social_accounts ?? [];
+        $socialAccounts[$provider] = $providerId;
+        $this->update(['social_accounts' => $socialAccounts]);
+    }
+
+    /**
+     * Unlink a social account from this user.
+     */
+    public function unlinkSocialAccount(string $provider): void
+    {
+        $socialAccounts = $this->social_accounts ?? [];
+        unset($socialAccounts[$provider]);
+        $this->update(['social_accounts' => $socialAccounts]);
     }
 
     /**

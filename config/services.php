@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    // Social login providers - configuration moved to config/social.php
+    // These entries are kept for Laravel Socialite compatibility
+    'google' => config('social.providers.google'),
+    'microsoft' => config('social.providers.microsoft'),
+
 ];
