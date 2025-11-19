@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "192b742e7f063cb88afb03ffeeb0a117",
+    "content-hash": "c8d6f6202f69de35d08387360e55b28e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1624,6 +1624,59 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.10.1"
             },
             "time": "2025-01-27T14:24:01+00:00"
+        },
+        {
+            "name": "lavalite/core",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "./packages/lavalite/core",
+                "reference": "bc339d30435439d5aa47f192698e56f6bff1ed46"
+            },
+            "require": {
+                "illuminate/database": "^11.0|^12.0",
+                "illuminate/http": "^11.0|^12.0",
+                "illuminate/support": "^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^9.0",
+                "phpunit/phpunit": "^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Lavalite\\Core\\LavaliteCoreServiceProvider"
+                    ],
+                    "aliases": {
+                        "LavaliteCore": "Lavalite\\Core\\Facades\\LavaliteCore"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Lavalite\\Core\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Lavalite\\Core\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lavalite Team",
+                    "email": "team@lavalite.org"
+                }
+            ],
+            "description": "Core package for Lavalite microservices with authentication, multi-tenancy, and shared utilities",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "lcobucci/clock",
@@ -8858,7 +8911,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "lavalite/core": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -6,7 +6,39 @@ use Illuminate\Database\Eloquent\Model;
 
 class Module extends Model
 {
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The data type of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'integer';
+
+    /**
+     * Boot the model and generate a random ID.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                // Generate a random 16-digit number
+                do {
+                    $model->id = mt_rand(1000000000000000, 9999999999999999);
+                } while (static::where('id', $model->id)->exists());
+            }
+        });
+    }
+
     protected $fillable = [
+        'id',
         'name',
         'slug',
         'code',

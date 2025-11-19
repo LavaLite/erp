@@ -30,7 +30,7 @@ class PermissionController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'organization_id' => 'nullable|string|max:50', // Can be UUID, 'global', or null
+            'organization_id' => 'nullable|string|max:50', // Can be UUID or 'global'
         ]);
 
         // Use organization from context if not explicitly provided in request
@@ -66,7 +66,7 @@ class PermissionController extends Controller
         }
 
         // Authorization checks
-        if (is_null($organizationId) || $organizationId === 'global') {
+        if ($organizationId === 'global') {
             // Creating a global permission - only super admins or global admins can do this
             if (! $request->user()->canManageGlobalRoles()) {
                 return response()->json([
@@ -131,8 +131,8 @@ class PermissionController extends Controller
             }
         }
 
-        // Only global admins can update to global permissions (organization_id = null or 'global')
-        if ($request->has('organization_id') && (is_null($request->organization_id) || $request->organization_id === 'global') && ! $request->user()->canManageGlobalRoles()) {
+        // Only global admins can update to global permissions (organization_id = 'global')
+        if ($request->has('organization_id') && $request->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
                 'error' => 'Only global admins can create or update global permissions',
             ], 403);

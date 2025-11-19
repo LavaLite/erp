@@ -19,11 +19,45 @@ class User extends Authenticatable implements JWTSubject
     use HasApiTokens, HasFactory, HasMultiOrganizationRolesAndPermissions, Notifiable, SoftDeletes;
 
     /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * The data type of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'integer';
+
+    /**
+     * Boot the model and generate a random ID.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->id) {
+                // Generate a random 16-digit number
+                do {
+                    $id = mt_rand(1000000000000000, 9999999999999999);
+                } while (static::where('id', $id)->exists());
+                
+                $model->setAttribute('id', $id);
+            }
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
+        'id',
         'first_name',
         'last_name',
         'email',

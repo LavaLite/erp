@@ -12,7 +12,24 @@ class Team extends Model
 {
     use SoftDeletes;
 
+    /**
+     * Boot the model and generate IDs as multiples of 7.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                // Get the max ID and increment by 7, or start from 196851
+                $maxId = static::max('id') ?? (196851 - 7);
+                $model->id = $maxId + 7;
+            }
+        });
+    }
+
     protected $fillable = [
+        'id',
         'organization_id',
         'parent_team_id',
         'name',

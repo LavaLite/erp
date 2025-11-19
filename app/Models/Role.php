@@ -11,7 +11,24 @@ class Role extends Model
 {
     use HasFactory;
 
+    /**
+     * Boot the model and generate IDs as multiples of 7.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                // Get the max ID and increment by 7, or start from 147329
+                $maxId = static::max('id') ?? (147329 - 7);
+                $model->id = $maxId + 7;
+            }
+        });
+    }
+
     protected $fillable = [
+        'id',
         'organization_id',
         'name',
         'slug',

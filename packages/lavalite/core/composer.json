@@ -1,0 +1,44 @@
+{
+    "name": "lavalite/core",
+    "description": "Core package for Lavalite microservices with authentication, multi-tenancy, and shared utilities",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lavalite Team",
+            "email": "team@lavalite.org"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/database": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lavalite\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lavalite\\Core\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lavalite\\Core\\LavaliteCoreServiceProvider"
+            ],
+            "aliases": {
+                "LavaliteCore": "Lavalite\\Core\\Facades\\LavaliteCore"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

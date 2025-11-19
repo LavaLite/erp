@@ -142,7 +142,9 @@ class MultiOrganizationSeeder extends Seeder
 
         // Create sample users
         // Global Admin user (first user - manages global roles and permissions)
+        $globalAdminId = mt_rand(1000000000000000, 9999999999999999);
         $globalAdmin = User::create([
+            'id' => $globalAdminId,
             'first_name' => 'Global',
             'last_name' => 'Admin',
             'email' => 'globaladmin@lavalite.org',
@@ -157,9 +159,11 @@ class MultiOrganizationSeeder extends Seeder
             'language' => 'en',
             'bio' => 'Global Administrator with system-wide management capabilities',
         ]);
+        $this->command->info('Global Admin ID: ' . $globalAdmin->id);
 
         // Super Admin
         $superAdmin = User::create([
+            'id' => mt_rand(1000000000000000, 9999999999999999),
             'first_name' => 'Super',
             'last_name' => 'Admin',
             'email' => 'superadmin@lavalite.org',
@@ -177,6 +181,7 @@ class MultiOrganizationSeeder extends Seeder
 
         // User Admin (manages users only)
         $userAdmin = User::create([
+            'id' => mt_rand(1000000000000000, 9999999999999999),
             'first_name' => 'User',
             'last_name' => 'Admin',
             'email' => 'useradmin@lavalite.org',
@@ -194,6 +199,7 @@ class MultiOrganizationSeeder extends Seeder
 
         // Regular User
         $user = User::create([
+            'id' => mt_rand(1000000000000000, 9999999999999999),
             'first_name' => 'Regular',
             'last_name' => 'User',
             'email' => 'user@lavalite.org',
@@ -211,6 +217,7 @@ class MultiOrganizationSeeder extends Seeder
 
         // Client User
         $client = User::create([
+            'id' => mt_rand(1000000000000000, 9999999999999999),
             'first_name' => 'Client',
             'last_name' => 'User',
             'email' => 'client@lavalite.org',

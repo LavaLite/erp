@@ -303,7 +303,7 @@ class Organization extends Model
             'active_users_count' => $this->getActiveUsersCount(),
             'total_users_count' => $this->getTotalUsersCount(),
             'enabled_modules_count' => $this->getEnabledModulesCount(),
-            'enabled_modules' => $this->enabledModules()->get(['id', 'name', 'slug', 'code'])->map(function ($module) {
+            'enabled_modules' => $this->enabledModules()->get(['modules.id', 'modules.name', 'modules.slug', 'modules.code'])->map(function ($module) {
                 return [
                     'id' => $module->id,
                     'name' => $module->name,

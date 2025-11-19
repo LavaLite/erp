@@ -75,7 +75,15 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        return new UserResource($user->load('roles', 'organizations'));
+        return new UserResource($user->load('roles', 'permissions', 'organizations'));
+    }
+
+    /**
+     * Get current authenticated user's profile (alias for me()).
+     */
+    public function getProfile(Request $request)
+    {
+        return $this->me($request);
     }
 
     /**
@@ -192,7 +200,7 @@ class UserController extends Controller
     {
         $request->validate([
             'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = $request->user();
@@ -204,7 +212,7 @@ class UserController extends Controller
         }
 
         $user->update([
-            'password' => Hash::make($request->new_password),
+            'password' => Hash::make($request->password),
         ]);
 
         return response()->json([

@@ -11,7 +11,24 @@ class Permission extends Model
 {
     use HasFactory;
 
+    /**
+     * Boot the model and generate IDs as multiples of 7.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                // Get the max ID and increment by 7, or start from 182574
+                $maxId = static::max('id') ?? (182574 - 7);
+                $model->id = $maxId + 7;
+            }
+        });
+    }
+
     protected $fillable = [
+        'id',
         'organization_id',
         'name',
         'slug',

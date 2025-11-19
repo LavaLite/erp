@@ -149,6 +149,47 @@ class ModuleController extends Controller
     }
 
     /**
+     * Enable modules for an organization (bulk or single).
+     */
+    public function enableModulesForOrganization(Request $request, $organizationId)
+    {
+        $validator = Validator::make($request->all(), [
+            'module_id' => 'required_without:module_ids|string|exists:modules,id',
+            'module_ids' => 'required_without:module_id|array',
+            'module_ids.*' => 'string|exists:modules,id',
+            'settings' => 'nullable|array',
+            'limits' => 'nullable|array',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $organization = Organization::findOrFail($organizationId);
+        
+        // Handle single module or multiple modules
+        $moduleIds = $request->module_ids ?? [$request->module_id];
+        
+        foreach ($moduleIds as $moduleId) {
+            $module = Module::findOrFail($moduleId);
+            $organization->enableModule(
+                $module,
+                $request->settings ?? [],
+                $request->limits ?? [],
+                $request->expires_at
+            );
+        }
+
+        return response()->json([
+            'message' => count($moduleIds) === 1 
+                ? 'Module enabled for organization successfully'
+                : 'Modules enabled for organization successfully',
+            'enabled_count' => count($moduleIds),
+        ], 200);
+    }
+
+    /**
      * Enable a module for an organization.
      */
     public function enableForOrganization(Request $request, $organizationId, $moduleId)

@@ -30,7 +30,7 @@ class RoleController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'organization_id' => 'nullable|string|max:50', // Can be UUID, 'global', or null
+            'organization_id' => 'nullable|string|max:50', // Can be UUID or 'global'
         ]);
 
         // Use organization from context if not explicitly provided in request
@@ -66,7 +66,7 @@ class RoleController extends Controller
         }
 
         // Authorization checks
-        if (is_null($organizationId) || $organizationId === 'global') {
+        if ($organizationId === 'global') {
             // Creating a global role - only super admins or global admins can do this
             if (! $request->user()->canManageGlobalRoles()) {
                 return response()->json([
@@ -132,8 +132,8 @@ class RoleController extends Controller
             }
         }
 
-        // Only global admins can update to global roles (organization_id = null or 'global')
-        if ($request->has('organization_id') && (is_null($request->organization_id) || $request->organization_id === 'global') && ! $request->user()->canManageGlobalRoles()) {
+        // Only global admins can update to global roles (organization_id = 'global')
+        if ($request->has('organization_id') && $request->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
                 'error' => 'Only global admins can create or update global roles',
             ], 403);
@@ -211,14 +211,14 @@ class RoleController extends Controller
         }
 
         // Only global admins can assign global roles (including global admin role)
-        if (($role->organization_id === 'global' || is_null($role->organization_id)) && ! $request->user()->canManageGlobalRoles()) {
+        if ($role->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
                 'error' => 'Only global admins can assign global roles',
             ], 403);
         }
 
         // Verify role belongs to the tenant or is global
-        if ($organization && $role->organization_id !== $organization->id && $role->organization_id !== 'global' && ! is_null($role->organization_id)) {
+        if ($organization && $role->organization_id !== $organization->id && $role->organization_id !== 'global') {
             return response()->json([
                 'error' => 'Role does not belong to this tenant',
             ], 400);

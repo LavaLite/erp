@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\OrganizationResource;
+use App\Http\Resources\PermissionResource;
+use App\Http\Resources\RoleResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +39,9 @@ class UserResource extends JsonResource
 
             // Include roles if loaded
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
+
+            // Include permissions if loaded
+            'permissions' => PermissionResource::collection($this->whenLoaded('permissions')),
 
             // Include organizations if loaded
             'organizations' => OrganizationResource::collection($this->whenLoaded('organizations')),

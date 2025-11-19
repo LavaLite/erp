@@ -16,7 +16,7 @@ return new class extends Migration
     {
         // Create modules table
         Schema::create('modules', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('name'); // e.g., "Inventory Management"
             $table->string('slug')->unique(); // e.g., "inventory-management"
             $table->string('code')->unique(); // e.g., "INV" - short identifier

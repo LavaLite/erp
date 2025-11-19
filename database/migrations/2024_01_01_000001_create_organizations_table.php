@@ -9,9 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
-     * Creates the organizations table with UUID primary key for multi-organization support.
-     * Includes subscription and billing fields for SaaS integration, timezone/localization,
-     * and organization_user pivot table.
+     * This table caches basic organization data from the Auth microservice.
+     * The complete organization data lives in the Auth service.
      */
     public function up(): void
     {

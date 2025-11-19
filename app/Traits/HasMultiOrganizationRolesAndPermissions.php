@@ -38,7 +38,7 @@ trait HasMultiOrganizationRolesAndPermissions
     }
 
     /**
-     * Get roles for a specific organization (includes global roles where organization_id is null or 'global').
+     * Get roles for a specific organization (includes global roles where organization_id is 'global').
      */
     public function rolesInOrganization(Organization|int|string $organization): BelongsToMany
     {
@@ -46,7 +46,6 @@ trait HasMultiOrganizationRolesAndPermissions
 
         return $this->roles()->where(function ($query) use ($organizationId) {
             $query->wherePivot('organization_id', $organizationId)
-                ->orWhereNull('roles.organization_id')
                 ->orWhere('roles.organization_id', 'global');
         });
     }
@@ -62,10 +61,7 @@ trait HasMultiOrganizationRolesAndPermissions
             $roleSlug = $role;
 
             $role = Role::where('slug', $roleSlug)
-                ->where(function ($query) {
-                    $query->where('organization_id', 'global')
-                        ->orWhereNull('organization_id');
-                })
+                ->where('organization_id', 'global')
                 ->first();
 
             if (! $role) {
@@ -222,7 +218,6 @@ trait HasMultiOrganizationRolesAndPermissions
                 ->where('slug', $permission)
                 ->where(function ($query) use ($organizationId) {
                     $query->where('organization_id', $organizationId)
-                        ->orWhereNull('organization_id')
                         ->orWhere('organization_id', 'global');
                 })
                 ->exists()) {
@@ -283,7 +278,6 @@ trait HasMultiOrganizationRolesAndPermissions
         $directPermissions = $this->permissions()
             ->where(function ($query) use ($organizationId) {
                 $query->where('organization_id', $organizationId)
-                    ->orWhereNull('organization_id')
                     ->orWhere('organization_id', 'global');
             })
             ->get();

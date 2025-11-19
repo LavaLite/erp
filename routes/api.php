@@ -37,6 +37,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     // User profile management
     Route::get('/me', [UserController::class, 'me']);
+    Route::get('/profile', [UserController::class, 'getProfile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
     Route::post('/profile/avatar', [UserController::class, 'uploadAvatar']);
     Route::delete('/profile/avatar', [UserController::class, 'deleteAvatar']);
@@ -64,12 +65,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::delete('/{id}', [OrganizationController::class, 'destroy']);
 
         // Tenant user management
+        Route::get('/{id}/users', [OrganizationController::class, 'getUsers']);
+        Route::post('/{id}/users', [OrganizationController::class, 'addUser']);
         Route::post('/{id}/add-user', [OrganizationController::class, 'addUser']);
         Route::post('/{id}/remove-user', [OrganizationController::class, 'removeUser']);
         Route::get('/{id}/context', [OrganizationController::class, 'userContext']);
 
         // Organization module management
         Route::get('/{id}/modules', [ModuleController::class, 'getOrganizationModules']);
+        Route::post('/{id}/modules', [ModuleController::class, 'enableModulesForOrganization']);
         Route::post('/{id}/modules/{moduleId}/enable', [ModuleController::class, 'enableForOrganization']);
         Route::post('/{id}/modules/{moduleId}/disable', [ModuleController::class, 'disableForOrganization']);
     });
@@ -81,9 +85,15 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/organizations/{organizationId}/users/count', [OrganizationUsageController::class, 'getUsersCount']);
         Route::get('/organizations/{organizationId}/modules', [OrganizationUsageController::class, 'getModules']);
         Route::get('/organizations/{organizationId}/subscription', [OrganizationUsageController::class, 'getSubscriptionStatus']);
+        Route::get('/organizations/{organizationId}/limit', [OrganizationUsageController::class, 'getLimits']);
+        Route::put('/organizations/{organizationId}/limit', [OrganizationUsageController::class, 'updateLimits']);
 
         // Update subscription from billing service
-        Route::patch('/organizations/{organizationId}/subscription', [OrganizationUsageController::class, 'updateSubscription']);
+        Route::put('/organizations/{organizationId}/subscription', [OrganizationUsageController::class, 'updateSubscription']);
+        Route::post('/organizations/{organizationId}/suspend', [OrganizationUsageController::class, 'suspendOrganization']);
+        Route::post('/organizations/{organizationId}/activate', [OrganizationUsageController::class, 'activateOrganization']);
+        Route::post('/organizations/{organizationId}/reactivate', [OrganizationUsageController::class, 'activateOrganization']);
+        Route::post('/organizations/{organizationId}/cancel', [OrganizationUsageController::class, 'cancelOrganization']);
 
         // Check limits
         Route::post('/organizations/{organizationId}/check-user-limit', [OrganizationUsageController::class, 'checkUserLimit']);
@@ -121,6 +131,7 @@ Route::middleware(['auth:api'])->group(function () {
 
         // Get user's teams
         Route::get('/my-teams', [App\Http\Controllers\Api\TeamController::class, 'myTeams']);
+        Route::get('/my', [App\Http\Controllers\Api\TeamController::class, 'myTeams']);
 
         // Create team
         Route::post('/', [App\Http\Controllers\Api\TeamController::class, 'store']);

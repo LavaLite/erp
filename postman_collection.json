@@ -28,6 +28,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -74,18 +78,22 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"john@lavalite.org\",\n  \"password\": \"password\",\n  \"organization_id\": \"acme\"\n}"
+							"raw": "{\n  \"email\": \"john@lavalite.org\",\n  \"password\": \"password\",\n  \"organization_id\": \"9d5c88e7-a1b2-4c3d-9e8f-123456789abc\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/login",
 							"host": ["{{base_url}}"],
 							"path": ["login"]
 						},
-						"description": "Login with email, password, and optional organization ID/slug"
+						"description": "Login with email and password. Organization ID is optional - if not provided, uses first organization. To specify organization, add: \"organization_id\": \"9d5c88e7-1234-5678-9abc-123456789012\" (must be valid UUID)"
 					},
 					"response": []
 				},
@@ -93,7 +101,12 @@
 					"name": "Get Current User",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/me",
 							"host": ["{{base_url}}"],
@@ -121,7 +134,12 @@
 					],
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/refresh",
 							"host": ["{{base_url}}"],
@@ -135,7 +153,12 @@
 					"name": "Logout",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/logout",
 							"host": ["{{base_url}}"],
@@ -170,6 +193,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -200,7 +227,12 @@
 							"name": "Send Verification Email",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
 								"url": {
 									"raw": "{{base_url}}/email/send-verification",
 									"host": ["{{base_url}}"],
@@ -220,6 +252,10 @@
 								"header": [
 									{
 										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
 										"value": "application/json"
 									}
 								],
@@ -246,6 +282,10 @@
 								"header": [
 									{
 										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
 										"value": "application/json"
 									}
 								],
@@ -278,6 +318,10 @@
 									{
 										"key": "Content-Type",
 										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
 									}
 								],
 								"body": {
@@ -304,6 +348,10 @@
 									{
 										"key": "Content-Type",
 										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
 									}
 								],
 								"body": {
@@ -328,7 +376,12 @@
 							"name": "Enable 2FA",
 							"request": {
 								"method": "POST",
-								"header": [],
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
 								"url": {
 									"raw": "{{base_url}}/2fa/enable",
 									"host": ["{{base_url}}"],
@@ -345,6 +398,10 @@
 								"header": [
 									{
 										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
 										"value": "application/json"
 									}
 								],
@@ -372,6 +429,10 @@
 									{
 										"key": "Content-Type",
 										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
 									}
 								],
 								"body": {
@@ -395,6 +456,10 @@
 									{
 										"key": "Content-Type",
 										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
 									}
 								],
 								"body": {
@@ -417,6 +482,10 @@
 								"header": [
 									{
 										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
 										"value": "application/json"
 									}
 								],
@@ -445,7 +514,12 @@
 					"name": "Get Profile",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/profile",
 							"host": ["{{base_url}}"],
@@ -462,6 +536,10 @@
 						"header": [
 							{
 								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
 								"value": "application/json"
 							}
 						],
@@ -482,7 +560,12 @@
 					"name": "Upload Avatar",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"body": {
 							"mode": "formdata",
 							"formdata": [
@@ -506,7 +589,12 @@
 					"name": "Delete Avatar",
 					"request": {
 						"method": "DELETE",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/profile/avatar",
 							"host": ["{{base_url}}"],
@@ -523,6 +611,10 @@
 						"header": [
 							{
 								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
 								"value": "application/json"
 							}
 						],
@@ -546,6 +638,10 @@
 						"header": [
 							{
 								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
 								"value": "application/json"
 							}
 						],
@@ -572,7 +668,12 @@
 					"name": "List My Organizations",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/organizations",
 							"host": ["{{base_url}}"],
@@ -605,6 +706,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -628,6 +733,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -657,6 +766,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -686,6 +799,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -711,6 +828,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -740,6 +861,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -775,6 +900,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -794,6 +923,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -817,6 +950,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -840,6 +977,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -869,6 +1010,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -898,6 +1043,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -923,6 +1072,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -952,6 +1105,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -985,6 +1142,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1018,6 +1179,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1051,6 +1216,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1086,6 +1255,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1109,6 +1282,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1132,6 +1309,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1161,6 +1342,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1190,6 +1375,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1215,6 +1404,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1238,6 +1431,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1265,6 +1462,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1290,7 +1491,12 @@
 					"name": "List All Modules",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
 						"url": {
 							"raw": "{{base_url}}/modules",
 							"host": ["{{base_url}}"],
@@ -1308,6 +1514,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1337,6 +1547,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1366,6 +1580,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1399,6 +1617,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1438,6 +1660,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1467,6 +1693,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1500,6 +1730,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"body": {
@@ -1529,6 +1763,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {
@@ -1554,6 +1792,10 @@
 							{
 								"key": "X-Organization-ID",
 								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
 							}
 						],
 						"url": {

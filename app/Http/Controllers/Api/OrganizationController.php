@@ -128,6 +128,28 @@ class OrganizationController extends Controller
     }
 
     /**
+     * Get users in organization.
+     */
+    public function getUsers(Request $request, string $id)
+    {
+        $organization = Organization::findOrFail($id);
+
+        // Check if requester has access to this organization
+        if (! $request->user()->belongsToOrganization($organization)) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $users = $organization->users()
+            ->with(['roles' => function ($query) use ($organization) {
+                $query->where('roles.organization_id', $organization->id)
+                    ->orWhereNull('roles.organization_id');
+            }])
+            ->paginate($request->get('per_page', 15));
+
+        return \App\Http\Resources\UserResource::collection($users);
+    }
+
+    /**
      * Remove user from organization.
      */
     public function removeUser(Request $request, string $organizationId)

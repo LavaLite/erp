@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -16,7 +17,7 @@ return new class extends Migration
     {
         // Create roles table
         Schema::create('roles', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('organization_id', 50)->nullable(); // String to support 'global'
             $table->string('name');
             $table->string('slug');
@@ -29,7 +30,7 @@ return new class extends Migration
 
         // Create permissions table
         Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('organization_id', 50)->nullable(); // String to support 'global'
             $table->string('name');
             $table->string('slug');

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         // Teams table - organization-scoped teams
         Schema::create('teams', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary();
             $table->uuid('organization_id');
             $table->foreignId('parent_team_id')->nullable()->constrained('teams')->onDelete('set null');
             $table->string('name');

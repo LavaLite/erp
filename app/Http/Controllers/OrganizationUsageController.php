@@ -98,6 +98,130 @@ class OrganizationUsageController extends Controller
     }
 
     /**
+     * Get organization limits.
+     */
+    public function getLimits(string $organizationId): JsonResponse
+    {
+        $organization = Organization::findOrFail($organizationId);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'organization_id' => $organization->id,
+                'max_users' => $organization->max_users,
+                'current_active_users' => $organization->getActiveUsersCount(),
+                'current_total_users' => $organization->getTotalUsersCount(),
+                'enabled_modules_count' => $organization->getEnabledModulesCount(),
+                'can_add_users' => $organization->canAddUsers(),
+                'available_user_slots' => $organization->max_users
+                    ? max(0, $organization->max_users - $organization->getActiveUsersCount())
+                    : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Update organization limits.
+     */
+    public function updateLimits(Request $request, string $organizationId): JsonResponse
+    {
+        $validated = $request->validate([
+            'max_users' => 'required|integer|nullable|min:1',
+        ]);
+
+        $organization = Organization::findOrFail($organizationId);
+        $organization->updateUserLimit($validated['max_users']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Organization limits updated successfully',
+            'data' => [
+                'organization_id' => $organization->id,
+                'max_users' => $organization->max_users,
+                'current_active_users' => $organization->getActiveUsersCount(),
+                'available_user_slots' => $organization->max_users
+                    ? max(0, $organization->max_users - $organization->getActiveUsersCount())
+                    : null,
+            ],
+        ]);
+    }
+
+    /**
+     * Suspend an organization.
+     */
+    public function suspendOrganization(string $organizationId): JsonResponse
+    {
+        $organization = Organization::findOrFail($organizationId);
+        $organization->suspendSubscription();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Organization suspended successfully',
+            'data' => [
+                'organization_id' => $organization->id,
+                'subscription_status' => $organization->subscription_status,
+            ],
+        ]);
+    }
+
+    /**
+     * Activate an organization.
+     */
+    public function activateOrganization(Request $request, string $organizationId): JsonResponse
+    {
+        $validated = $request->validate([
+            'subscription_id' => 'sometimes|string',
+            'plan_id' => 'nullable|string',
+        ]);
+
+        $organization = Organization::findOrFail($organizationId);
+        
+        // Use existing subscription_id if not provided
+        $subscriptionId = $validated['subscription_id'] ?? $organization->subscription_id;
+        
+        if (!$subscriptionId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Subscription ID is required for activation',
+            ], 422);
+        }
+        
+        $organization->activateSubscription(
+            $subscriptionId,
+            $validated['plan_id'] ?? null
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Organization activated successfully',
+            'data' => [
+                'organization_id' => $organization->id,
+                'subscription_status' => $organization->subscription_status,
+                'subscription_id' => $organization->subscription_id,
+                'plan_id' => $organization->plan_id,
+            ],
+        ]);
+    }
+
+    /**
+     * Cancel an organization subscription.
+     */
+    public function cancelOrganization(string $organizationId): JsonResponse
+    {
+        $organization = Organization::findOrFail($organizationId);
+        $organization->cancelSubscription();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Organization subscription cancelled successfully',
+            'data' => [
+                'organization_id' => $organization->id,
+                'subscription_status' => $organization->subscription_status,
+            ],
+        ]);
+    }
+
+    /**
      * Update subscription details from billing service.
      * This endpoint allows the billing service to update subscription status.
      */
