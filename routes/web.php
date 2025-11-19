@@ -7,6 +7,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Guest routes (for unauthenticated users)
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -23,21 +24,23 @@ Route::get('/reset-password/{token}', function ($token) {
     return view('auth.reset-password', ['token' => $token]);
 })->name('password.reset');
 
-// Email verification route (GET for clicking links in emails)
-Route::get('/verify-email', [EmailVerificationController::class, 'verifyViaGet'])
-    ->name('verification.verify');
-
-// Email not verified page
-Route::get('/email-not-verified', function () {
-    return view('auth.email-not-verified');
-})->name('email.not.verified');
-
 // Login submission (web)
 Route::post('/login', [\App\Http\Controllers\Web\AuthController::class, 'login'])
     ->name('login.submit');
 
+// Email verification route (GET for clicking links in emails)
+Route::get('/verify-email', [EmailVerificationController::class, 'verifyViaGet'])
+    ->name('verification.verify');
+
+// Email not verified page - accessible to authenticated users
+Route::get('/email-not-verified', function () {
+    return view('auth.email-not-verified');
+})->middleware('auth:web')
+    ->name('email.not.verified');
+
 // Logout (web)
 Route::post('/logout', [\App\Http\Controllers\Web\AuthController::class, 'logout'])
+    ->middleware('auth:web')
     ->name('logout');
 
 // Protected web routes
@@ -45,11 +48,11 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    
+
     Route::get('/settings', function () {
         return view('settings');
     })->name('settings');
-    
+
     Route::get('/change-password', function () {
         return view('settings');
     })->name('password.change');

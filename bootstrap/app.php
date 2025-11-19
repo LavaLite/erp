@@ -40,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => \App\Http\Middleware\SetLocale::class,
             'timezone' => \App\Http\Middleware\SetTimezone::class,
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
