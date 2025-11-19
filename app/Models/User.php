@@ -40,12 +40,12 @@ class User extends Authenticatable implements JWTSubject
         parent::boot();
 
         static::creating(function ($model) {
-            if (!$model->id) {
+            if (! $model->id) {
                 // Generate a random 16-digit number
                 do {
                     $id = mt_rand(1000000000000000, 9999999999999999);
                 } while (static::where('id', $id)->exists());
-                
+
                 $model->setAttribute('id', $id);
             }
         });

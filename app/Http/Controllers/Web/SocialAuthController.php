@@ -18,7 +18,7 @@ class SocialAuthController extends Controller
     public function redirect(string $provider)
     {
         $this->validateProvider($provider);
-        
+
         return Socialite::driver($provider)->redirect();
     }
 
@@ -32,17 +32,17 @@ class SocialAuthController extends Controller
         try {
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 
+            return redirect()->route('login')->with('error',
                 __('messages.auth.social_login_error', ['provider' => ucfirst($provider)])
             );
         }
 
         // Find user by provider ID in social_accounts JSON or by email
-        $user = User::whereJsonContains('social_accounts->' . $provider, $socialUser->getId())
+        $user = User::whereJsonContains('social_accounts->'.$provider, $socialUser->getId())
             ->orWhere('email', $socialUser->getEmail())
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             // Create new user
             $user = User::create([
                 'first_name' => $socialUser->getName() ?? explode('@', $socialUser->getEmail())[0],
@@ -56,18 +56,18 @@ class SocialAuthController extends Controller
         } else {
             // Update provider ID if not set
             $socialAccounts = $user->social_accounts ?? [];
-            if (!isset($socialAccounts[$provider])) {
+            if (! isset($socialAccounts[$provider])) {
                 $socialAccounts[$provider] = $socialUser->getId();
                 $user->social_accounts = $socialAccounts;
                 $user->save();
             }
-            
+
             // Auto-verify email if not already verified
-            if (!$user->email_verified_at) {
+            if (! $user->email_verified_at) {
                 $user->email_verified_at = now();
                 $user->save();
             }
-            
+
             // Update avatar if empty
             if ($socialUser->getAvatar() && empty($user->avatar)) {
                 $user->avatar = $socialUser->getAvatar();
@@ -82,7 +82,7 @@ class SocialAuthController extends Controller
         Auth::guard('web')->login($user, true);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'))->with('success', 
+        return redirect()->intended(route('dashboard'))->with('success',
             __('messages.auth.social_login_success', ['provider' => ucfirst($provider)])
         );
     }
@@ -93,11 +93,11 @@ class SocialAuthController extends Controller
     protected function validateProvider(string $provider): void
     {
         $enabledProviders = array_keys(array_filter(
-            config('social.providers', []), 
-            fn($p) => $p['enabled'] ?? false
+            config('social.providers', []),
+            fn ($p) => $p['enabled'] ?? false
         ));
-        
-        if (!in_array($provider, $enabledProviders)) {
+
+        if (! in_array($provider, $enabledProviders)) {
             abort(404);
         }
     }

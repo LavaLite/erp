@@ -175,17 +175,17 @@ class OrganizationUsageController extends Controller
         ]);
 
         $organization = Organization::findOrFail($organizationId);
-        
+
         // Use existing subscription_id if not provided
         $subscriptionId = $validated['subscription_id'] ?? $organization->subscription_id;
-        
-        if (!$subscriptionId) {
+
+        if (! $subscriptionId) {
             return response()->json([
                 'success' => false,
                 'message' => __('messages.billing.subscription_id_required'),
             ], 422);
         }
-        
+
         $organization->activateSubscription(
             $subscriptionId,
             $validated['plan_id'] ?? null

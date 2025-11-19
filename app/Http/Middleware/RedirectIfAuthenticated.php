@@ -21,12 +21,12 @@ class RedirectIfAuthenticated
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 $user = Auth::guard($guard)->user();
-                
+
                 // If email verification is required and user hasn't verified, redirect to verification page
-                if (config('auth.email_verification_required', true) && !$user->hasVerifiedEmail()) {
+                if (config('auth.email_verification_required', true) && ! $user->hasVerifiedEmail()) {
                     return redirect()->route('email.not.verified', ['email' => $user->email]);
                 }
-                
+
                 // Otherwise redirect to dashboard
                 return redirect()->route('dashboard');
             }

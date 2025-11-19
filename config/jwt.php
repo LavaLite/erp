@@ -57,7 +57,7 @@ return [
         |
         */
 
-        'public' => env('JWT_PUBLIC_KEY', 'file://' . storage_path('keys/public_v1.pem')),
+        'public' => env('JWT_PUBLIC_KEY', 'file://'.storage_path('keys/public_v1.pem')),
 
         /*
         |--------------------------------------------------------------------------
@@ -70,7 +70,7 @@ return [
         |
         */
 
-        'private' => env('JWT_PRIVATE_KEY', 'file://' . storage_path('keys/private_v1.pem')),
+        'private' => env('JWT_PRIVATE_KEY', 'file://'.storage_path('keys/private_v1.pem')),
 
         /*
         |--------------------------------------------------------------------------

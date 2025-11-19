@@ -36,7 +36,7 @@ class SetTimezone
         // Priority 1: X-Timezone header (for API clients)
         if ($request->hasHeader('X-Timezone')) {
             $timezone = $request->header('X-Timezone');
-            if (!empty($timezone)) {
+            if (! empty($timezone)) {
                 return $timezone;
             }
         }
@@ -57,7 +57,7 @@ class SetTimezone
         // Priority 4: Query parameter (for testing/one-off requests)
         if ($request->has('timezone')) {
             $timezone = $request->query('timezone');
-            if (!empty($timezone)) {
+            if (! empty($timezone)) {
                 return $timezone;
             }
         }

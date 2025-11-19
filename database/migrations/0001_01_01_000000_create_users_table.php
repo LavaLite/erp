@@ -24,6 +24,7 @@ return new class extends Migration
             $table->timestamp('two_factor_confirmed_at')->nullable();
             $table->string('phone')->nullable();
             $table->string('avatar')->nullable();
+            $table->json('social_accounts')->nullable();
             $table->date('date_of_birth')->nullable();
             $table->enum('gender', ['male', 'female', 'other', 'prefer_not_to_say'])->nullable();
             $table->string('address_line1')->nullable();

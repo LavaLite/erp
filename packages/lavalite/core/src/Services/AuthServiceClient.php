@@ -15,7 +15,7 @@ class AuthServiceClient
     {
         $this->baseUrl = config('lavalite-core.auth_service_url', 'http://localhost:8000');
         $this->apiKey = config('lavalite-core.auth_service_api_key', '');
-        
+
         if (empty($this->baseUrl)) {
             throw new \RuntimeException('Auth service URL is not configured. Please set AUTH_SERVICE_URL in your .env file.');
         }

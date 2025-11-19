@@ -159,7 +159,7 @@ class MultiOrganizationSeeder extends Seeder
             'language' => 'en',
             'bio' => 'Global Administrator with system-wide management capabilities',
         ]);
-        $this->command->info('Global Admin ID: ' . $globalAdmin->id);
+        $this->command->info('Global Admin ID: '.$globalAdmin->id);
 
         // Super Admin
         $superAdmin = User::create([

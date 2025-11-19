@@ -2,9 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\OrganizationResource;
-use App\Http\Resources\PermissionResource;
-use App\Http\Resources\RoleResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

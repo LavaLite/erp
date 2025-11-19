@@ -167,10 +167,10 @@ class ModuleController extends Controller
         }
 
         $organization = Organization::findOrFail($organizationId);
-        
+
         // Handle single module or multiple modules
         $moduleIds = $request->module_ids ?? [$request->module_id];
-        
+
         foreach ($moduleIds as $moduleId) {
             $module = Module::findOrFail($moduleId);
             $organization->enableModule(
@@ -182,7 +182,7 @@ class ModuleController extends Controller
         }
 
         return response()->json([
-            'message' => count($moduleIds) === 1 
+            'message' => count($moduleIds) === 1
                 ? __('messages.module.enabled')
                 : __('messages.module.enabled_plural'),
             'enabled_count' => count($moduleIds),

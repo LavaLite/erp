@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\Api\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
     return view('welcome');

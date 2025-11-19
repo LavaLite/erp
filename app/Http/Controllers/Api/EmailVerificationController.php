@@ -103,6 +103,7 @@ class EmailVerificationController extends Controller
         $throttleKey = 'resend-verification-email:'.$request->email;
         if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+
             return response()->json([
                 'error' => __('messages.verification.rate_limit', ['seconds' => $seconds]),
             ], 429);

@@ -19,7 +19,7 @@ return [
             'icon' => 'google', // Icon identifier for frontend
             'client_id' => env('GOOGLE_CLIENT_ID'),
             'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-            'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL') . '/auth/google/callback'),
+            'redirect' => env('GOOGLE_REDIRECT_URL', env('APP_URL').'/auth/google/callback'),
         ],
 
         'microsoft' => [
@@ -28,7 +28,7 @@ return [
             'icon' => 'microsoft',
             'client_id' => env('MICROSOFT_CLIENT_ID'),
             'client_secret' => env('MICROSOFT_CLIENT_SECRET'),
-            'redirect' => env('MICROSOFT_REDIRECT_URL', env('APP_URL') . '/auth/microsoft/callback'),
+            'redirect' => env('MICROSOFT_REDIRECT_URL', env('APP_URL').'/auth/microsoft/callback'),
         ],
 
         // Add more providers as needed:
