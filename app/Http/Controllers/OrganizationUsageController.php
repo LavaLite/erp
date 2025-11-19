@@ -134,7 +134,7 @@ class OrganizationUsageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Organization limits updated successfully',
+            'message' => __('messages.organization.limits_updated'),
             'data' => [
                 'organization_id' => $organization->id,
                 'max_users' => $organization->max_users,
@@ -156,7 +156,7 @@ class OrganizationUsageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Organization suspended successfully',
+            'message' => __('messages.organization.suspended'),
             'data' => [
                 'organization_id' => $organization->id,
                 'subscription_status' => $organization->subscription_status,
@@ -182,7 +182,7 @@ class OrganizationUsageController extends Controller
         if (!$subscriptionId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Subscription ID is required for activation',
+                'message' => __('messages.billing.subscription_id_required'),
             ], 422);
         }
         
@@ -193,7 +193,7 @@ class OrganizationUsageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Organization activated successfully',
+            'message' => __('messages.organization.activated'),
             'data' => [
                 'organization_id' => $organization->id,
                 'subscription_status' => $organization->subscription_status,
@@ -213,7 +213,7 @@ class OrganizationUsageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Organization subscription cancelled successfully',
+            'message' => __('messages.organization.cancelled'),
             'data' => [
                 'organization_id' => $organization->id,
                 'subscription_status' => $organization->subscription_status,
@@ -240,7 +240,7 @@ class OrganizationUsageController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Subscription updated successfully',
+            'message' => __('messages.billing.subscription_updated'),
             'data' => [
                 'organization_id' => $organization->id,
                 'subscription_status' => $organization->subscription_status,

@@ -61,7 +61,7 @@ class PermissionController extends Controller
 
         if ($existingPermission) {
             return response()->json([
-                'error' => 'A permission with this slug already exists for this tenant',
+                'error' => __('messages.permission.slug_exists'),
             ], 422);
         }
 
@@ -70,7 +70,7 @@ class PermissionController extends Controller
             // Creating a global permission - only super admins or global admins can do this
             if (! $request->user()->canManageGlobalRoles()) {
                 return response()->json([
-                    'error' => 'Only global admins can create global permissions',
+                    'error' => __('messages.permission.global_only'),
                 ], 403);
             }
         } else {
@@ -78,7 +78,7 @@ class PermissionController extends Controller
             $organization = Organization::findOrFail($organizationId);
             if (! $request->user()->hasRoleInOrganization('admin', $organization)) {
                 return response()->json([
-                    'error' => 'Only organization admins can create permissions in their organization',
+                    'error' => __('messages.permission.admin_only'),
                 ], 403);
             }
         }
@@ -126,7 +126,7 @@ class PermissionController extends Controller
 
             if ($existingPermission) {
                 return response()->json([
-                    'error' => 'A permission with this slug already exists for this tenant',
+                    'error' => __('messages.permission.slug_exists'),
                 ], 422);
             }
         }
@@ -134,7 +134,7 @@ class PermissionController extends Controller
         // Only global admins can update to global permissions (organization_id = 'global')
         if ($request->has('organization_id') && $request->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
-                'error' => 'Only global admins can create or update global permissions',
+                'error' => __('messages.permission.global_only'),
             ], 403);
         }
 
@@ -152,7 +152,7 @@ class PermissionController extends Controller
         $permission->delete();
 
         return response()->json([
-            'message' => 'Permission deleted successfully',
+            'message' => __('messages.permission.deleted'),
         ]);
     }
 
@@ -171,7 +171,7 @@ class PermissionController extends Controller
         $user->givePermissionTo($permission);
 
         return response()->json([
-            'message' => 'Permission assigned to user successfully',
+            'message' => __('messages.permission.assigned'),
             'user' => $user->load('permissions'),
         ]);
     }
@@ -191,7 +191,7 @@ class PermissionController extends Controller
         $user->revokePermissionTo($permission);
 
         return response()->json([
-            'message' => 'Permission removed from user successfully',
+            'message' => __('messages.permission.removed'),
             'user' => $user->load('permissions'),
         ]);
     }

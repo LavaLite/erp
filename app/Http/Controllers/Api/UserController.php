@@ -138,7 +138,7 @@ class UserController extends Controller
         ]));
 
         return response()->json([
-            'message' => 'Profile updated successfully',
+            'message' => __('messages.user.profile_updated'),
             'user' => [
                 'id' => $user->id,
                 'first_name' => $user->first_name,
@@ -171,7 +171,7 @@ class UserController extends Controller
         $user->update(['avatar' => $avatarPath]);
 
         return response()->json([
-            'message' => 'Avatar uploaded successfully',
+            'message' => __('messages.user.avatar_uploaded'),
             'avatar' => Storage::url($avatarPath),
         ]);
     }
@@ -189,7 +189,7 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'message' => 'Avatar deleted successfully',
+            'message' => __('messages.user.avatar_deleted'),
         ]);
     }
 
@@ -207,7 +207,7 @@ class UserController extends Controller
 
         if (! Hash::check($request->current_password, $user->password)) {
             return response()->json([
-                'error' => 'Current password is incorrect',
+                'error' => __('messages.password.current_incorrect'),
             ], 422);
         }
 
@@ -216,7 +216,7 @@ class UserController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Password changed successfully',
+            'message' => __('messages.user.password_changed'),
         ]);
     }
 
@@ -236,7 +236,7 @@ class UserController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Preferences updated successfully',
+            'message' => __('messages.user.preferences_updated'),
             'preferences' => $user->preferences,
         ]);
     }

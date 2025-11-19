@@ -126,7 +126,7 @@ class ModuleController extends Controller
         $module = Module::findOrFail($id);
         $module->delete();
 
-        return response()->json(['message' => 'Module deleted successfully'], 200);
+        return response()->json(['message' => __('messages.module.deleted')], 200);
     }
 
     /**
@@ -183,8 +183,8 @@ class ModuleController extends Controller
 
         return response()->json([
             'message' => count($moduleIds) === 1 
-                ? 'Module enabled for organization successfully'
-                : 'Modules enabled for organization successfully',
+                ? __('messages.module.enabled')
+                : __('messages.module.enabled_plural'),
             'enabled_count' => count($moduleIds),
         ], 200);
     }
@@ -215,7 +215,7 @@ class ModuleController extends Controller
         );
 
         return response()->json([
-            'message' => 'Module enabled for organization successfully',
+            'message' => __('messages.module.enabled'),
             'module' => new ModuleResource($module->fresh()),
         ], 200);
     }
@@ -231,7 +231,7 @@ class ModuleController extends Controller
         $organization->disableModule($module);
 
         return response()->json([
-            'message' => 'Module disabled for organization successfully',
+            'message' => __('messages.module.disabled'),
         ], 200);
     }
 }

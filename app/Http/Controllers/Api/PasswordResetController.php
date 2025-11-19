@@ -26,7 +26,7 @@ class PasswordResetController extends Controller
         if (! $user) {
             // Don't reveal if user exists
             return response()->json([
-                'message' => 'If your email is registered, you will receive a password reset link.',
+                'message' => __('messages.password.reset_sent'),
             ]);
         }
 
@@ -42,7 +42,7 @@ class PasswordResetController extends Controller
         Mail::to($user->email)->send(new ResetPasswordMail($user, $resetUrl, $token));
 
         return response()->json([
-            'message' => 'If your email is registered, you will receive a password reset link.',
+            'message' => __('messages.password.reset_sent'),
         ]);
     }
 
@@ -61,14 +61,14 @@ class PasswordResetController extends Controller
 
         if (! $user) {
             return response()->json([
-                'error' => 'Invalid password reset token.',
+                'error' => __('messages.password.invalid_token'),
             ], 400);
         }
 
         // Verify token
         if (! Password::tokenExists($user, $request->token)) {
             return response()->json([
-                'error' => 'Invalid or expired password reset token.',
+                'error' => __('messages.password.invalid_token'),
             ], 400);
         }
 
@@ -81,7 +81,7 @@ class PasswordResetController extends Controller
         Password::deleteToken($user);
 
         return response()->json([
-            'message' => 'Password reset successfully.',
+            'message' => __('messages.password.reset_success'),
         ]);
     }
 }

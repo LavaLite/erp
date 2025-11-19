@@ -23,7 +23,7 @@ class RoleModuleController extends Controller
         if (! $organizationId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Organization ID is required in X-Organization-ID header',
+                'message' => __('messages.auth.org_context_required'),
             ], 400);
         }
 
@@ -34,7 +34,7 @@ class RoleModuleController extends Controller
         if (! $role) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role not found in this organization',
+                'message' => __('messages.role.not_found_in_org'),
             ], 404);
         }
 
@@ -42,7 +42,7 @@ class RoleModuleController extends Controller
         if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Only owners and admins can view role modules.',
+                'message' => __('messages.role.view_modules_denied'),
             ], 403);
         }
 
@@ -79,7 +79,7 @@ class RoleModuleController extends Controller
         if (! $organizationId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Organization ID is required in X-Organization-ID header',
+                'message' => __('messages.auth.org_context_required'),
             ], 400);
         }
 
@@ -90,7 +90,7 @@ class RoleModuleController extends Controller
         if (! $role) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role not found in this organization',
+                'message' => __('messages.role.not_found_in_org'),
             ], 404);
         }
 
@@ -98,7 +98,7 @@ class RoleModuleController extends Controller
         if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Only owners and admins can assign modules to roles.',
+                'message' => __('messages.role.manage_modules_denied'),
             ], 403);
         }
 
@@ -119,7 +119,7 @@ class RoleModuleController extends Controller
         if (! empty($invalidModules)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Some modules are not enabled for this organization',
+                'message' => __('messages.module.some_not_enabled'),
                 'invalid_module_ids' => $invalidModules,
             ], 422);
         }
@@ -133,7 +133,7 @@ class RoleModuleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Modules assigned to role successfully',
+            'message' => __('messages.role.modules_assigned'),
             'data' => [
                 'role' => [
                     'id' => $role->id,
@@ -159,7 +159,7 @@ class RoleModuleController extends Controller
         if (! $organizationId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Organization ID is required in X-Organization-ID header',
+                'message' => __('messages.auth.org_context_required'),
             ], 400);
         }
 
@@ -170,7 +170,7 @@ class RoleModuleController extends Controller
         if (! $role) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role not found in this organization',
+                'message' => __('messages.role.not_found_in_org'),
             ], 404);
         }
 
@@ -179,7 +179,7 @@ class RoleModuleController extends Controller
         if (! $module) {
             return response()->json([
                 'success' => false,
-                'message' => 'Module not found',
+                'message' => __('messages.module.not_found'),
             ], 404);
         }
 
@@ -187,7 +187,7 @@ class RoleModuleController extends Controller
         if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Only owners and admins can manage role modules.',
+                'message' => __('messages.role.manage_modules_denied'),
             ], 403);
         }
 
@@ -201,7 +201,7 @@ class RoleModuleController extends Controller
         if (! $isEnabled) {
             return response()->json([
                 'success' => false,
-                'message' => 'Module is not enabled for this organization',
+                'message' => __('messages.module.not_enabled'),
             ], 422);
         }
 
@@ -210,7 +210,7 @@ class RoleModuleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Module '{$module->name}' added to role '{$role->name}'",
+            'message' => __('messages.role.module_added', ['module' => $module->name, 'role' => $role->name]),
             'data' => [
                 'role' => [
                     'id' => $role->id,
@@ -239,7 +239,7 @@ class RoleModuleController extends Controller
         if (! $organizationId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Organization ID is required in X-Organization-ID header',
+                'message' => __('messages.auth.org_context_required'),
             ], 400);
         }
 
@@ -250,7 +250,7 @@ class RoleModuleController extends Controller
         if (! $role) {
             return response()->json([
                 'success' => false,
-                'message' => 'Role not found in this organization',
+                'message' => __('messages.role.not_found_in_org'),
             ], 404);
         }
 
@@ -259,7 +259,7 @@ class RoleModuleController extends Controller
         if (! $module) {
             return response()->json([
                 'success' => false,
-                'message' => 'Module not found',
+                'message' => __('messages.module.not_found'),
             ], 404);
         }
 
@@ -267,7 +267,7 @@ class RoleModuleController extends Controller
         if (! $user->hasRoleInOrganization(['owner', 'admin'], $organizationId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. Only owners and admins can manage role modules.',
+                'message' => __('messages.role.manage_modules_denied'),
             ], 403);
         }
 
@@ -276,7 +276,7 @@ class RoleModuleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Module '{$module->name}' removed from role '{$role->name}'",
+            'message' => __('messages.role.module_removed', ['module' => $module->name, 'role' => $role->name]),
         ]);
     }
 
@@ -293,7 +293,7 @@ class RoleModuleController extends Controller
         if (! $user->organizations()->where('organizations.id', $organizationId)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized. You are not a member of this organization.',
+                'message' => __('messages.auth.no_org_access'),
             ], 403);
         }
 

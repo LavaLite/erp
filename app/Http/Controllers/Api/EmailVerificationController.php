@@ -39,9 +39,7 @@ class EmailVerificationController extends Controller
         $user->email_verification_sent_at = now();
         $user->save();
 
-        return response()->json([
-            'message' => __('Verification email sent successfully.'),
-        ]);
+        return response()->json(['message' => __('messages.verification.sent')]);
     }
 
     /**
@@ -58,24 +56,24 @@ class EmailVerificationController extends Controller
 
         if (! $user) {
             return response()->json([
-                'error' => __('User not found.'),
+                'error' => __('messages.verification.user_not_found'),
             ], 404);
         }
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => __('Email already verified.'),
+                'message' => __('messages.verification.already_verified'),
             ]);
         }
 
         if (! $user->verifyEmail($request->token)) {
             return response()->json([
-                'error' => __('Invalid or expired verification token.'),
+                'error' => __('messages.verification.invalid_token'),
             ], 400);
         }
 
         return response()->json([
-            'message' => __('Email verified successfully.'),
+            'message' => __('messages.verification.verified'),
         ]);
     }
 
@@ -92,27 +90,22 @@ class EmailVerificationController extends Controller
 
         if (! $user) {
             return response()->json([
-                'error' => __('User not found.'),
+                'error' => __('messages.verification.user_not_found'),
             ], 404);
         }
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => __('Email already verified.'),
+                'message' => __('messages.verification.already_verified'),
             ], 400);
         }
 
-        // Rate limiting: check if last email was sent less than 1 minute ago
-        if ($user->email_verification_sent_at) {
-            $secondsSinceLastEmail = now()->diffInSeconds($user->email_verification_sent_at);
-            
-            // Only enforce rate limit if email was sent within last 60 seconds
-            if ($secondsSinceLastEmail < 60) {
-                $waitSeconds = 60 - $secondsSinceLastEmail;
-                return response()->json([
-                    'error' => __('Please wait :seconds seconds before requesting another verification email.', ['seconds' => ceil($waitSeconds)]),
-                ], 429);
-            }
+        $throttleKey = 'resend-verification-email:'.$request->email;
+        if (RateLimiter::tooManyAttempts($throttleKey, 1)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return response()->json([
+                'error' => __('messages.verification.rate_limit', ['seconds' => $seconds]),
+            ], 429);
         }
 
         // Generate new verification token
@@ -129,10 +122,9 @@ class EmailVerificationController extends Controller
         // Update sent timestamp
         $user->email_verification_sent_at = now();
         $user->save();
+        RateLimiter::hit($throttleKey, 60); // Allow 1 attempt per minute
 
-        return response()->json([
-            'message' => __('Verification email resent successfully.'),
-        ]);
+        return response()->json(['message' => __('messages.verification.resent')]);
     }
 
     /**
@@ -150,8 +142,8 @@ class EmailVerificationController extends Controller
         if ($validator->fails()) {
             return view('auth.email-verification-result', [
                 'success' => false,
-                'message' => __('Invalid verification link. Missing token or email parameter.'),
-                'title' => __('Verification Failed'),
+                'message' => __('messages.verification.invalid_link'),
+                'title' => __('messages.verification.failed_title'),
             ]);
         }
 
@@ -160,31 +152,31 @@ class EmailVerificationController extends Controller
         if (! $user) {
             return view('auth.email-verification-result', [
                 'success' => false,
-                'message' => __('User not found.'),
-                'title' => __('Verification Failed'),
+                'message' => __('messages.verification.user_not_found'),
+                'title' => __('messages.verification.failed_title'),
             ]);
         }
 
         if ($user->hasVerifiedEmail()) {
             return view('auth.email-verification-result', [
                 'success' => true,
-                'message' => __('Your email address has already been verified.'),
-                'title' => __('Already Verified'),
+                'message' => __('messages.verification.already_verified_message'),
+                'title' => __('messages.verification.already_verified_title'),
             ]);
         }
 
         if (! $user->verifyEmail($request->token)) {
             return view('auth.email-verification-result', [
                 'success' => false,
-                'message' => __('The verification link is invalid or has expired. Please request a new verification email.'),
-                'title' => __('Verification Failed'),
+                'message' => __('messages.verification.expired'),
+                'title' => __('messages.verification.failed_title'),
             ]);
         }
 
         return view('auth.email-verification-result', [
             'success' => true,
-            'message' => __('Your email address has been verified successfully! You can now log in to your account.'),
-            'title' => __('Email Verified'),
+            'title' => __('messages.verification.verified_title'),
+            'message' => __('messages.verification.verified_message'),
         ]);
     }
 }

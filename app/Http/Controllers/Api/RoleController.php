@@ -61,7 +61,7 @@ class RoleController extends Controller
 
         if ($existingRole) {
             return response()->json([
-                'error' => 'A role with this slug already exists for this tenant',
+                'error' => __('messages.role.slug_exists'),
             ], 422);
         }
 
@@ -70,7 +70,7 @@ class RoleController extends Controller
             // Creating a global role - only super admins or global admins can do this
             if (! $request->user()->canManageGlobalRoles()) {
                 return response()->json([
-                    'error' => 'Only global admins can create global roles',
+                    'error' => __('messages.role.global_only'),
                 ], 403);
             }
         } else {
@@ -79,7 +79,7 @@ class RoleController extends Controller
 
             if (! $request->user()->hasRoleInOrganization('admin', $organization)) {
                 return response()->json([
-                    'error' => 'Only organization admins can create roles in their organization',
+                    'error' => __('messages.role.admin_only'),
                 ], 403);
             }
         }
@@ -127,7 +127,7 @@ class RoleController extends Controller
 
             if ($existingRole) {
                 return response()->json([
-                    'error' => 'A role with this slug already exists for this tenant',
+                    'error' => __('messages.role.slug_exists'),
                 ], 422);
             }
         }
@@ -135,7 +135,7 @@ class RoleController extends Controller
         // Only global admins can update to global roles (organization_id = 'global')
         if ($request->has('organization_id') && $request->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
-                'error' => 'Only global admins can create or update global roles',
+                'error' => __('messages.role.global_only'),
             ], 403);
         }
 
@@ -153,7 +153,7 @@ class RoleController extends Controller
         $role->delete();
 
         return response()->json([
-            'message' => 'Role deleted successfully',
+            'message' => __('messages.role.deleted'),
         ]);
     }
 
@@ -189,12 +189,12 @@ class RoleController extends Controller
         if ($organizationId && $organizationId !== 'global') {
             if (! preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $organizationId)) {
                 return response()->json([
-                    'error' => 'The organization id must be a valid UUID or "global".',
+                    'error' => __('messages.organization.invalid_uuid'),
                 ], 422);
             }
             if (! Organization::where('id', $organizationId)->exists()) {
                 return response()->json([
-                    'error' => 'The selected organization id is invalid.',
+                    'error' => __('messages.organization.invalid_id'),
                 ], 422);
             }
         }
@@ -206,28 +206,28 @@ class RoleController extends Controller
         // Only super admins can assign the superadmin role
         if ($role->slug === 'superadmin' && ! $request->user()->isSuperAdmin()) {
             return response()->json([
-                'error' => 'Only super admins can assign the superadmin role',
+                'error' => __('messages.role.superadmin_only'),
             ], 403);
         }
 
         // Only global admins can assign global roles (including global admin role)
         if ($role->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
             return response()->json([
-                'error' => 'Only global admins can assign global roles',
+                'error' => __('messages.role.global_assign_only'),
             ], 403);
         }
 
         // Verify role belongs to the tenant or is global
         if ($organization && $role->organization_id !== $organization->id && $role->organization_id !== 'global') {
             return response()->json([
-                'error' => 'Role does not belong to this tenant',
+                'error' => __('messages.role.not_belong'),
             ], 400);
         }
 
         $user->assignRoleInOrganization($role, $organization);
 
         return response()->json([
-            'message' => 'Role assigned successfully',
+            'message' => __('messages.role.assigned'),
             'user' => $user->load('roles'),
         ]);
     }
@@ -249,14 +249,14 @@ class RoleController extends Controller
         // Verify role belongs to the tenant
         if ($role->organization_id !== $organization->id) {
             return response()->json([
-                'error' => 'Role does not belong to this tenant',
+                'error' => __('messages.role.not_belong'),
             ], 400);
         }
 
         $user->removeRoleInOrganization($role, $organization);
 
         return response()->json([
-            'message' => 'Role removed successfully',
+            'message' => __('messages.role.removed'),
             'user' => $user->load('roles'),
         ]);
     }
@@ -274,7 +274,7 @@ class RoleController extends Controller
         $role->permissions()->syncWithoutDetaching($request->permission_id);
 
         return response()->json([
-            'message' => 'Permission assigned to role successfully',
+            'message' => __('messages.role.permission_assigned'),
             'role' => $role->load('permissions'),
         ]);
     }
@@ -292,7 +292,7 @@ class RoleController extends Controller
         $role->permissions()->detach($request->permission_id);
 
         return response()->json([
-            'message' => 'Permission removed from role successfully',
+            'message' => __('messages.role.permission_removed'),
             'role' => $role->load('permissions'),
         ]);
     }

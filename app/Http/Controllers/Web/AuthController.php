@@ -30,7 +30,7 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials are incorrect.',
+            'email' => __('messages.auth.invalid_credentials'),
         ])->onlyInput('email');
     }
 

@@ -56,7 +56,7 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => new UserResource($user),
-            'message' => 'Registration successful. Please check your email to verify your account before logging in.',
+            'message' => __('messages.auth.register_success'),
             'email_verification_required' => config('auth.email_verification_required', true),
         ], 201);
     }
@@ -74,7 +74,7 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => [__('messages.auth.invalid_credentials')],
             ]);
         }
 
@@ -83,7 +83,7 @@ class AuthController extends Controller
             if (! $request->two_factor_code) {
                 return response()->json([
                     'requires_2fa' => true,
-                    'message' => 'Two-factor authentication code required.',
+                    'message' => __('messages.2fa.required'),
                 ], 200);
             }
 
@@ -101,7 +101,7 @@ class AuthController extends Controller
 
             if (! $valid) {
                 return response()->json([
-                    'error' => 'Invalid two-factor authentication code.',
+                    'error' => __('messages.2fa.invalid_code'),
                 ], 401);
             }
         }
@@ -109,8 +109,8 @@ class AuthController extends Controller
         // Check email verification if required
         if (config('auth.email_verification_required', true) && !$user->hasVerifiedEmail()) {
             return response()->json([
-                'error' => 'Email verification required.',
-                'message' => 'Please verify your email address before logging in. Check your inbox for the verification link.',
+                'error' => __('messages.auth.email_not_verified'),
+                'message' => __('messages.auth.email_verification_message'),
                 'code' => 'EMAIL_NOT_VERIFIED',
                 'email' => $user->email,
             ], 403);
@@ -207,11 +207,11 @@ class AuthController extends Controller
                 ->update(['revoked_at' => now()]);
 
             return response()->json([
-                'message' => 'Successfully logged out',
+                'message' => __('messages.auth.logout_success'),
             ])->cookie('refresh_token', '', -1); // Delete refresh token cookie
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Failed to logout, please try again.',
+                'error' => __('messages.error.server_error'),
             ], 500);
         }
     }
@@ -226,7 +226,7 @@ class AuthController extends Controller
 
         if (! $refreshTokenString) {
             return response()->json([
-                'error' => 'Refresh token not provided',
+                'error' => __('messages.auth.token_invalid'),
             ], 401);
         }
 
@@ -235,14 +235,14 @@ class AuthController extends Controller
 
         if (! $refreshToken) {
             return response()->json([
-                'error' => 'Invalid refresh token',
+                'error' => __('messages.auth.token_invalid'),
             ], 401);
         }
 
         // Check if token is valid
         if (! $refreshToken->isValid()) {
             return response()->json([
-                'error' => 'Refresh token has expired or been revoked',
+                'error' => __('messages.auth.token_expired'),
             ], 401);
         }
 
@@ -320,13 +320,13 @@ class AuthController extends Controller
 
         if (! $organization) {
             return response()->json([
-                'error' => 'Organization not found.',
+                'error' => __('messages.auth.organization_not_found'),
             ], 404);
         }
 
         if (! $user->belongsToOrganization($organization)) {
             return response()->json([
-                'error' => 'You do not have access to this organization.',
+                'error' => __('messages.auth.no_org_access'),
             ], 403);
         }
 
@@ -367,7 +367,7 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
             'expires_in' => config('jwt.ttl') * 60,
             'current_organization' => $currentOrganization,
-            'message' => 'Successfully switched to '.$organization->name,
+            'message' => __('messages.auth.switched_organization', ['name' => $organization->name]),
         ]);
     }
 

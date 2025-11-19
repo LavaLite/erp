@@ -33,7 +33,7 @@ class SocialAuthController extends Controller
             $socialUser = Socialite::driver($provider)->user();
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 
-                __('Unable to login with :provider. Please try again.', ['provider' => ucfirst($provider)])
+                __('messages.auth.social_login_error', ['provider' => ucfirst($provider)])
             );
         }
 
@@ -83,7 +83,7 @@ class SocialAuthController extends Controller
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard'))->with('success', 
-            __('Successfully logged in with :provider!', ['provider' => ucfirst($provider)])
+            __('messages.auth.social_login_success', ['provider' => ucfirst($provider)])
         );
     }
 

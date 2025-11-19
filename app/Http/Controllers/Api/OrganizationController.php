@@ -53,7 +53,7 @@ class OrganizationController extends Controller
 
         // Check if user has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         return new OrganizationResource($organization);
@@ -68,7 +68,7 @@ class OrganizationController extends Controller
 
         // Check if user has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $request->validate([
@@ -94,12 +94,12 @@ class OrganizationController extends Controller
 
         // Check if user has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $organization->delete();
 
-        return response()->json(['message' => 'Organization deleted successfully']);
+        return response()->json(['message' => __('messages.organization.deleted')]);
     }
 
     /**
@@ -116,13 +116,13 @@ class OrganizationController extends Controller
 
         // Check if requester has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $user->joinOrganization($organization);
 
         return response()->json([
-            'message' => 'User added to organization successfully',
+            'message' => __('messages.organization.user_added'),
             'organization' => new OrganizationResource($organization->load('users')),
         ]);
     }
@@ -136,7 +136,7 @@ class OrganizationController extends Controller
 
         // Check if requester has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $users = $organization->users()
@@ -163,13 +163,13 @@ class OrganizationController extends Controller
 
         // Check if requester has access to this organization
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $user->leaveOrganization($organization);
 
         return response()->json([
-            'message' => 'User removed from organization successfully',
+            'message' => __('messages.organization.user_removed'),
         ]);
     }
 
@@ -181,7 +181,7 @@ class OrganizationController extends Controller
         $organization = $request->attributes->get('organization') ?? app('organization');
 
         if (! $organization) {
-            return response()->json(['message' => 'No organization context set'], 404);
+            return response()->json(['message' => __('messages.auth.no_org_context')], 404);
         }
 
         return new OrganizationResource($organization->load('roles', 'permissions'));
@@ -195,7 +195,7 @@ class OrganizationController extends Controller
         $organization = Organization::findOrFail($organizationId);
 
         if (! $request->user()->belongsToOrganization($organization)) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.auth.unauthorized')], 403);
         }
 
         $roles = $request->user()->rolesInOrganization($organization)->get();

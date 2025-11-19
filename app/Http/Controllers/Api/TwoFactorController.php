@@ -32,7 +32,7 @@ class TwoFactorController extends Controller
 
         if ($user->two_factor_enabled) {
             return response()->json([
-                'error' => 'Two-factor authentication is already enabled.',
+                'error' => __('messages.2fa.already_enabled'),
             ], 400);
         }
 
@@ -68,7 +68,7 @@ class TwoFactorController extends Controller
             'secret' => $secret,
             'qr_code_svg' => $qrCodeSvg,
             'recovery_codes' => $recoveryCodes,
-            'message' => 'Scan the QR code with your authenticator app and confirm with a valid code.',
+            'message' => __('messages.2fa.scan_qr'),
         ]);
     }
 
@@ -86,7 +86,7 @@ class TwoFactorController extends Controller
 
         if ($user->two_factor_enabled) {
             return response()->json([
-                'error' => 'Two-factor authentication is already enabled.',
+                'error' => __('messages.2fa.already_enabled'),
             ], 400);
         }
 
@@ -96,7 +96,7 @@ class TwoFactorController extends Controller
 
         if (! $secret || empty($recoveryCodes)) {
             return response()->json([
-                'error' => 'Please call /2fa/enable first to generate a secret.',
+                'error' => __('messages.2fa.enable_first'),
             ], 400);
         }
 
@@ -105,7 +105,7 @@ class TwoFactorController extends Controller
 
         if (! $valid) {
             return response()->json([
-                'error' => 'Invalid authentication code.',
+                'error' => __('messages.2fa.invalid_code'),
             ], 400);
         }
 
@@ -116,7 +116,7 @@ class TwoFactorController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Two-factor authentication enabled successfully.',
+            'message' => __('messages.2fa.enabled'),
             'recovery_codes' => $recoveryCodes,
         ]);
     }
@@ -134,14 +134,14 @@ class TwoFactorController extends Controller
 
         if (! $user->two_factor_enabled) {
             return response()->json([
-                'error' => 'Two-factor authentication is not enabled.',
+                'error' => __('messages.2fa.not_enabled'),
             ], 400);
         }
 
         // Verify password
         if (! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'error' => 'Invalid password.',
+                'error' => __('messages.auth.invalid_credentials'),
             ], 400);
         }
 
@@ -149,7 +149,7 @@ class TwoFactorController extends Controller
         $user->disableTwoFactor();
 
         return response()->json([
-            'message' => 'Two-factor authentication disabled successfully.',
+            'message' => __('messages.2fa.disabled'),
         ]);
     }
 
@@ -167,7 +167,7 @@ class TwoFactorController extends Controller
 
         if (! $user || ! $user->two_factor_enabled) {
             return response()->json([
-                'error' => 'Two-factor authentication is not enabled for this user.',
+                'error' => __('messages.2fa.not_enabled_user'),
             ], 400);
         }
 
@@ -177,13 +177,13 @@ class TwoFactorController extends Controller
         if (strlen($request->code) > 6) {
             if ($user->useRecoveryCode($request->code)) {
                 return response()->json([
-                    'message' => 'Recovery code accepted.',
+                    'message' => __('messages.2fa.recovery_accepted'),
                     'valid' => true,
                 ]);
             }
 
             return response()->json([
-                'error' => 'Invalid recovery code.',
+                'error' => __('messages.2fa.invalid_recovery'),
                 'valid' => false,
             ], 400);
         }
@@ -193,13 +193,13 @@ class TwoFactorController extends Controller
 
         if (! $valid) {
             return response()->json([
-                'error' => 'Invalid authentication code.',
+                'error' => __('messages.2fa.invalid_code'),
                 'valid' => false,
             ], 400);
         }
 
         return response()->json([
-            'message' => 'Authentication code verified.',
+            'message' => __('messages.2fa.code_verified'),
             'valid' => true,
         ]);
     }
@@ -217,14 +217,14 @@ class TwoFactorController extends Controller
 
         if (! $user->two_factor_enabled) {
             return response()->json([
-                'error' => 'Two-factor authentication is not enabled.',
+                'error' => __('messages.2fa.not_enabled'),
             ], 400);
         }
 
         // Verify password
         if (! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'error' => 'Invalid password.',
+                'error' => __('messages.auth.invalid_credentials'),
             ], 400);
         }
 
@@ -236,7 +236,7 @@ class TwoFactorController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Recovery codes regenerated successfully.',
+            'message' => __('messages.2fa.recovery_codes_generated'),
             'recovery_codes' => $recoveryCodes,
         ]);
     }
