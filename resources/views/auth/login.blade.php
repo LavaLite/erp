@@ -76,7 +76,7 @@
 
             <!-- Login Form Card -->
             <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 shadow-2xl">
-                <form method="POST" action="/api/login" class="space-y-6">
+                <form method="POST" action="{{ route('login.submit') }}" class="space-y-6">
                     @csrf
 
                     <!-- Email -->
@@ -195,65 +195,11 @@
     </div>
 
     <script>
-        // Redirect to dashboard if already logged in
-        if (localStorage.getItem('auth_token')) {
-            window.location.href = '/dashboard';
-        }
-
-        document.querySelector('form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.innerHTML;
-            
-            // Disable button and show loading
+        // Simple form submission with loading state
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const submitButton = this.querySelector('button[type="submit"]');
             submitButton.disabled = true;
             submitButton.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
-            
-            try {
-                const formData = new FormData(form);
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Store token if provided
-                    if (data.access_token) {
-                        localStorage.setItem('auth_token', data.access_token);
-                    }
-                    if (data.refresh_token) {
-                        localStorage.setItem('refresh_token', data.refresh_token);
-                    }
-                    if (data.user) {
-                        localStorage.setItem('user_data', JSON.stringify(data.user));
-                    }
-                    // Redirect to dashboard
-                    window.location.href = '/dashboard';
-                } else {
-                    // Show error messages
-                    if (data.message) {
-                        alert(data.message);
-                    } else if (data.errors) {
-                        const errors = Object.values(data.errors).flat();
-                        alert(errors.join('\n'));
-                    }
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = originalButtonText;
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('An error occurred during login. Please try again.');
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
-            }
         });
     </script>
 

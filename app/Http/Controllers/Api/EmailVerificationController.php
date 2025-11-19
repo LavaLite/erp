@@ -119,4 +119,48 @@ class EmailVerificationController extends Controller
             'message' => 'Verification email resent successfully.',
         ]);
     }
+
+    /**
+     * Verify email via GET request (for clicking links in emails).
+     * Displays a success or error page.
+     */
+    public function verifyViaGet(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return view('auth.email-verification-result', [
+                'success' => false,
+                'message' => 'User not found.',
+                'title' => 'Verification Failed',
+            ]);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return view('auth.email-verification-result', [
+                'success' => true,
+                'message' => 'Your email address has already been verified.',
+                'title' => 'Already Verified',
+            ]);
+        }
+
+        if (! $user->verifyEmail($request->token)) {
+            return view('auth.email-verification-result', [
+                'success' => false,
+                'message' => 'The verification link is invalid or has expired. Please request a new verification email.',
+                'title' => 'Verification Failed',
+            ]);
+        }
+
+        return view('auth.email-verification-result', [
+            'success' => true,
+            'message' => 'Your email address has been verified successfully! You can now log in to your account.',
+            'title' => 'Email Verified',
+        ]);
+    }
 }

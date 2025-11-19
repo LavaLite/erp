@@ -54,13 +54,10 @@ class AuthController extends Controller
         // Note: Roles are assigned when user joins a tenant via joinOrganization()
         // New users don't have roles until they're added to an organization
 
-        $authToken = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json([
-            'access_token' => $authToken,
-            'token_type' => 'Bearer',
             'user' => new UserResource($user),
-            'message' => 'Registration successful. Please check your email to verify your account.',
+            'message' => 'Registration successful. Please check your email to verify your account before logging in.',
+            'email_verification_required' => config('auth.email_verification_required', true),
         ], 201);
     }
 
@@ -107,6 +104,16 @@ class AuthController extends Controller
                     'error' => 'Invalid two-factor authentication code.',
                 ], 401);
             }
+        }
+
+        // Check email verification if required
+        if (config('auth.email_verification_required', true) && !$user->hasVerifiedEmail()) {
+            return response()->json([
+                'error' => 'Email verification required.',
+                'message' => 'Please verify your email address before logging in. Check your inbox for the verification link.',
+                'code' => 'EMAIL_NOT_VERIFIED',
+                'email' => $user->email,
+            ], 403);
         }
 
         // Update last login information

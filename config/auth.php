@@ -117,4 +117,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification Required
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, users must verify their email address before they can
+    | access protected API routes. Set to false to disable this requirement.
+    |
+    */
+
+    'email_verification_required' => env('EMAIL_VERIFICATION_REQUIRED', true),
+
 ];

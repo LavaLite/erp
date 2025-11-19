@@ -30,7 +30,7 @@ Route::post('/password/reset', [PasswordResetController::class, 'reset'])->middl
 Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->middleware('throttle:5,1');
 
 // Protected routes - using JWT authentication
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/switch-organization', [AuthController::class, 'switchOrganization']);

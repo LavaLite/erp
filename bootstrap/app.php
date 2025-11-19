@@ -39,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle.auth' => \App\Http\Middleware\ThrottleAuthAttempts::class,
             'locale' => \App\Http\Middleware\SetLocale::class,
             'timezone' => \App\Http\Middleware\SetTimezone::class,
+            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

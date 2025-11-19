@@ -23,6 +23,8 @@ class TwoFactorController extends Controller
 
     /**
      * Enable two-factor authentication.
+     * For API: Returns secret and QR code for client to display.
+     * Client must call confirm() with a valid code to activate.
      */
     public function enable(Request $request)
     {
@@ -55,9 +57,12 @@ class TwoFactorController extends Controller
         // Generate recovery codes
         $recoveryCodes = $this->generateRecoveryCodes();
 
-        // Store temporarily (user needs to confirm)
-        $request->session()->put('2fa_secret', $secret);
-        $request->session()->put('2fa_recovery_codes', $recoveryCodes);
+        // Store temporarily in user record (not yet confirmed)
+        // We'll use a JSON field to store pending 2FA setup
+        $user->update([
+            'two_factor_secret' => encrypt($secret),
+            'two_factor_recovery_codes' => encrypt(json_encode($recoveryCodes)),
+        ]);
 
         return response()->json([
             'secret' => $secret,
@@ -69,6 +74,7 @@ class TwoFactorController extends Controller
 
     /**
      * Confirm and activate two-factor authentication.
+     * Verifies the TOTP code and enables 2FA if valid.
      */
     public function confirm(Request $request)
     {
@@ -84,12 +90,13 @@ class TwoFactorController extends Controller
             ], 400);
         }
 
-        $secret = $request->session()->get('2fa_secret');
-        $recoveryCodes = $request->session()->get('2fa_recovery_codes');
+        // Get the pending secret (stored during enable())
+        $secret = $user->getTwoFactorSecret();
+        $recoveryCodes = $user->getTwoFactorRecoveryCodes();
 
-        if (! $secret || ! $recoveryCodes) {
+        if (! $secret || empty($recoveryCodes)) {
             return response()->json([
-                'error' => 'Please enable 2FA first.',
+                'error' => 'Please call /2fa/enable first to generate a secret.',
             ], 400);
         }
 
@@ -102,11 +109,11 @@ class TwoFactorController extends Controller
             ], 400);
         }
 
-        // Enable 2FA
-        $user->enableTwoFactor($secret, $recoveryCodes);
-
-        // Clear session
-        $request->session()->forget(['2fa_secret', '2fa_recovery_codes']);
+        // Activate 2FA by setting the confirmed flag
+        $user->update([
+            'two_factor_enabled' => true,
+            'two_factor_confirmed_at' => now(),
+        ]);
 
         return response()->json([
             'message' => 'Two-factor authentication enabled successfully.',
