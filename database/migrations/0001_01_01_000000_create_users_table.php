@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
             $table->string('phone')->nullable();
             $table->string('avatar')->nullable();
             $table->date('date_of_birth')->nullable();
@@ -36,6 +40,8 @@ return new class extends Migration
             $table->boolean('is_super_admin')->default(false);
             $table->timestamp('last_login_at')->nullable();
             $table->string('last_login_ip')->nullable();
+            $table->string('email_verification_token', 100)->nullable();
+            $table->timestamp('email_verification_sent_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
