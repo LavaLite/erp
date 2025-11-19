@@ -16,7 +16,7 @@ return new class extends Migration
     {
         // Create roles table
         Schema::create('roles', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary();
+            $table->id();
             $table->string('organization_id', 50)->nullable(); // String to support 'global'
             $table->string('name');
             $table->string('slug');
@@ -29,7 +29,7 @@ return new class extends Migration
 
         // Create permissions table
         Schema::create('permissions', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary();
+            $table->id();
             $table->string('organization_id', 50)->nullable(); // String to support 'global'
             $table->string('name');
             $table->string('slug');
