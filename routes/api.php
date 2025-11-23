@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
+use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\ModuleController;
 use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\RoleModuleController;
+use App\Http\Controllers\Api\TeamInvitationController;
 use App\Http\Controllers\Api\TwoFactorController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\OrganizationUsageController;
@@ -29,6 +31,17 @@ Route::post('/password/reset', [PasswordResetController::class, 'reset'])->middl
 // Two-factor authentication verification (public - for login flow)
 Route::post('/2fa/verify', [TwoFactorController::class, 'verify'])->middleware('throttle:5,1');
 
+// Organization invitation routes (public)
+Route::get('/invitations/{token}', [InvitationController::class, 'show']);
+Route::get('/invitations/{token}/confirm', [InvitationController::class, 'showLandingPage']);
+Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept']);
+Route::post('/invitations/{token}/reject', [InvitationController::class, 'reject']);
+
+// Team invitation routes (public)
+Route::get('/team-invitations/{token}', [TeamInvitationController::class, 'show']);
+Route::post('/team-invitations/{token}/accept', [TeamInvitationController::class, 'accept']);
+Route::post('/team-invitations/{token}/reject', [TeamInvitationController::class, 'reject']);
+
 // Protected routes - using JWT authentication
 Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -44,6 +57,15 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::put('/profile/password', [UserController::class, 'changePassword']);
     Route::put('/profile/preferences', [UserController::class, 'updatePreferences']);
 
+    // User management CRUD
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('/{id}', [UserController::class, 'show']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'destroy']);
+    });
+
     // Email verification (authenticated)
     Route::post('/email/send-verification', [EmailVerificationController::class, 'send']);
 
@@ -54,6 +76,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
         Route::post('/disable', [TwoFactorController::class, 'disable']);
         Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes']);
     });
+
+    // User's pending invitations
+    Route::get('/invitations', [InvitationController::class, 'myInvitations']);
+    Route::get('/team-invitations', [TeamInvitationController::class, 'myInvitations']);
 
     // Tenant management routes
     Route::prefix('organizations')->group(function () {
@@ -68,7 +94,9 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
         Route::get('/{id}/users', [OrganizationController::class, 'getUsers']);
         Route::post('/{id}/users', [OrganizationController::class, 'addUser']);
         Route::post('/{id}/add-user', [OrganizationController::class, 'addUser']);
+        Route::post('/{id}/invite-user', [OrganizationController::class, 'inviteUser']);
         Route::post('/{id}/remove-user', [OrganizationController::class, 'removeUser']);
+        Route::post('/{id}/detach-user', [OrganizationController::class, 'removeUser']);
         Route::get('/{id}/context', [OrganizationController::class, 'userContext']);
 
         // Organization module management
@@ -116,12 +144,21 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::prefix('roles')->group(function () {
         // Allow POST to /api/roles for creating global or organization-scoped roles
         // Controller will determine if organization context is required based on organization_id parameter
+        Route::get('/', [RoleController::class, 'index']);
         Route::post('/', [RoleController::class, 'store']);
+        Route::get('/{id}', [RoleController::class, 'show']);
+        Route::put('/{id}', [RoleController::class, 'update']);
+        Route::delete('/{id}', [RoleController::class, 'destroy']);
         Route::post('/{id}/assign-user', [RoleController::class, 'assignToUser']);
+        Route::post('/{id}/remove-user', [RoleController::class, 'removeFromUser']);
     });
 
     Route::prefix('permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index']);
         Route::post('/', [PermissionController::class, 'store']);
+        Route::get('/{id}', [PermissionController::class, 'show']);
+        Route::put('/{id}', [PermissionController::class, 'update']);
+        Route::delete('/{id}', [PermissionController::class, 'destroy']);
     });
 
     // Team management routes (organization-scoped)
@@ -146,9 +183,13 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
         Route::delete('/{id}', [App\Http\Controllers\Api\TeamController::class, 'destroy']);
 
         // Team member management
+        Route::get('/{id}/members', [App\Http\Controllers\Api\TeamController::class, 'getMembers']);
         Route::post('/{id}/members', [App\Http\Controllers\Api\TeamController::class, 'addMember']);
+        Route::post('/{id}/invite-member', [App\Http\Controllers\Api\TeamController::class, 'inviteMember']);
         Route::delete('/{id}/members', [App\Http\Controllers\Api\TeamController::class, 'removeMember']);
+        Route::delete('/{id}/members/{userId}', [App\Http\Controllers\Api\TeamController::class, 'removeMemberById']);
         Route::patch('/{id}/members/role', [App\Http\Controllers\Api\TeamController::class, 'updateMemberRole']);
+        Route::put('/{id}/members/{userId}', [App\Http\Controllers\Api\TeamController::class, 'updateMemberRoleById']);
 
         // Assign modules to team
         Route::post('/{id}/modules', [App\Http\Controllers\Api\TeamController::class, 'assignModules']);
@@ -156,23 +197,8 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
     // Tenant-scoped routes (require tenant context)
     Route::middleware(['organization'])->group(function () {
-        // User management routes (admin only in tenant)
-        Route::middleware(['role:admin'])->group(function () {
-            Route::get('/users', [UserController::class, 'index']);
-            Route::get('/users/{id}', [UserController::class, 'show']);
-        });
-
         // Role management routes (admin only in tenant)
         Route::middleware(['role:admin'])->prefix('roles')->group(function () {
-            Route::get('/', [RoleController::class, 'index']);
-            Route::get('/{id}', [RoleController::class, 'show']);
-            Route::put('/{id}', [RoleController::class, 'update']);
-            Route::delete('/{id}', [RoleController::class, 'destroy']);
-
-            // Assign/remove roles to users - handled above without middleware
-            // Route::post('/{id}/assign-user', [RoleController::class, 'assignToUser']);
-            Route::post('/{id}/remove-user', [RoleController::class, 'removeFromUser']);
-
             // Assign/remove permissions to roles
             Route::post('/{id}/assign-permission', [RoleController::class, 'assignPermission']);
             Route::post('/{id}/remove-permission', [RoleController::class, 'removePermission']);
@@ -189,11 +215,6 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
         // Permission management routes (admin only in tenant)
         Route::middleware(['role:admin'])->prefix('permissions')->group(function () {
-            Route::get('/', [PermissionController::class, 'index']);
-            Route::get('/{id}', [PermissionController::class, 'show']);
-            Route::put('/{id}', [PermissionController::class, 'update']);
-            Route::delete('/{id}', [PermissionController::class, 'destroy']);
-
             // Assign/remove permissions directly to users
             Route::post('/{id}/assign-user', [PermissionController::class, 'assignToUser']);
             Route::post('/{id}/remove-user', [PermissionController::class, 'removeFromUser']);

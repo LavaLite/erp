@@ -12,8 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Only apply Sanctum stateful middleware to specific routes, not all API routes
+        // This prevents CSRF issues when using JWT authentication from external frontends
         $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \App\Http\Middleware\SetTimezone::class,
             \App\Http\Middleware\SetLocale::class,
         ]);

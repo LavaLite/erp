@@ -107,7 +107,7 @@ class AuthController extends Controller
         }
 
         // Check email verification if required
-        if (config('auth.email_verification_required', true) && ! $user->hasVerifiedEmail()) {
+        if (config('auth.email_verification_required', true) && !$user->hasVerifiedEmail()) {
             return response()->json([
                 'error' => __('messages.auth.email_not_verified'),
                 'message' => __('messages.auth.email_verification_message'),

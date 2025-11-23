@@ -126,6 +126,7 @@
 									"if (pm.response.code === 200) {",
 									"    const response = pm.response.json();",
 									"    pm.environment.set('jwt_token', response.access_token);",
+									"    pm.environment.set('refresh_token', response.refresh_token);",
 									"    console.log('✅ Token refreshed');",
 									"}"
 								]
@@ -133,21 +134,141 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "noauth"
+						},
 						"method": "POST",
 						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
 							{
 								"key": "Accept",
 								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
 						"url": {
 							"raw": "{{base_url}}/refresh",
 							"host": ["{{base_url}}"],
 							"path": ["refresh"]
 						},
-						"description": "Refresh JWT token to get a new access token"
+						"description": "Refresh JWT access token using refresh token. The refresh token can be provided in two ways:\n\n1. **Request Body** (shown here): Pass `refresh_token` in JSON body\n2. **HTTP-only Cookie**: The refresh_token cookie is automatically set on login for web apps\n\nThe endpoint returns:\n- New access_token (JWT)\n- New refresh_token (rotated for security)\n- User information\n- Organization context\n- Roles and permissions\n\nRefresh tokens expire after 14 days."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refresh_token\": \"your-refresh-token-here\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/refresh",
+									"host": ["{{base_url}}"],
+									"path": ["refresh"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"access_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...\",\n  \"refresh_token\": \"new-refresh-token-string\",\n  \"token_type\": \"Bearer\",\n  \"expires_in\": 3600,\n  \"refresh_expires_in\": 1209600,\n  \"user\": {\n    \"id\": 1,\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"full_name\": \"John Doe\",\n    \"email\": \"john@lavalite.org\",\n    \"email_verified_at\": \"2025-11-01T10:00:00.000000Z\",\n    \"two_factor_enabled\": false,\n    \"two_factor_confirmed_at\": null\n  },\n  \"organization_id\": \"9d5c88e7-a1b2-4c3d-9e8f-123456789abc\",\n  \"roles\": [\"admin\", \"member\"],\n  \"permissions\": [\"manage-users\", \"view-reports\"]\n}"
+						},
+						{
+							"name": "Invalid Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refresh_token\": \"invalid-token\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/refresh",
+									"host": ["{{base_url}}"],
+									"path": ["refresh"]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Invalid token\"\n}"
+						},
+						{
+							"name": "Expired Token",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"refresh_token\": \"expired-token\"\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/refresh",
+									"host": ["{{base_url}}"],
+									"path": ["refresh"]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"error\": \"Token has expired\"\n}"
+						}
+					]
 				},
 				{
 					"name": "Logout",
@@ -661,6 +782,171 @@
 			]
 		},
 		{
+			"name": "👥 User Management (CRUD)",
+			"description": "Full user management with create, read, update, delete operations",
+			"item": [
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?per_page=15&search=&sort_by=created_at&sort_order=desc&filter_by_organization=true",
+							"host": ["{{base_url}}"],
+							"path": ["users"],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items per page"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name or email"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at",
+									"description": "Sort field"
+								},
+								{
+									"key": "sort_order",
+									"value": "desc",
+									"description": "Sort order (asc/desc)"
+								},
+								{
+									"key": "filter_by_organization",
+									"value": "true",
+									"description": "Filter by current organization"
+								}
+							]
+						},
+						"description": "Get paginated list of users with search and filtering"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"phone\": \"+1-555-0123\",\n  \"date_of_birth\": \"1992-05-15\",\n  \"gender\": \"female\",\n  \"address_line1\": \"456 Oak Avenue\",\n  \"city\": \"San Francisco\",\n  \"state\": \"CA\",\n  \"postal_code\": \"94102\",\n  \"country\": \"USA\",\n  \"timezone\": \"America/Los_Angeles\",\n  \"language\": \"en\",\n  \"bio\": \"Product Manager\",\n  \"send_welcome_email\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": ["{{base_url}}"],
+							"path": ["users"]
+						},
+						"description": "Create a new user (no password confirmation required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "User UUID"
+								}
+							]
+						},
+						"description": "Get user details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"first_name\": \"Jane Updated\",\n  \"last_name\": \"Smith\",\n  \"email\": \"jane.updated@example.com\",\n  \"password\": \"NewSecurePass123!\",\n  \"phone\": \"+1-555-0199\",\n  \"city\": \"Los Angeles\",\n  \"state\": \"CA\",\n  \"timezone\": \"America/Los_Angeles\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "User UUID"
+								}
+							]
+						},
+						"description": "Update user details (password is optional)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": ["{{base_url}}"],
+							"path": ["users", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "User UUID"
+								}
+							]
+						},
+						"description": "Delete a user (cannot delete yourself)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "🏢 Organizations",
 			"description": "Multi-tenancy organization management",
 			"item": [
@@ -714,7 +1000,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"New Company\",\n  \"slug\": \"new-company\",\n  \"description\": \"A new organization\",\n  \"website\": \"https://newcompany.com\",\n  \"industry\": \"Technology\",\n  \"size\": \"10-50\",\n  \"subscription_status\": \"trial\",\n  \"max_users\": 10\n}"
+							"raw": "{\n  \"name\": \"New Company\",\n  \"slug\": \"new-company\",\n  \"description\": \"A new organization\",\n  \"email\": \"contact@newcompany.com\",\n  \"phone\": \"+1-555-0100\",\n  \"website\": \"https://newcompany.com\",\n  \"address\": \"123 Business Street\",\n  \"city\": \"San Francisco\",\n  \"state\": \"California\",\n  \"postal_code\": \"94102\",\n  \"country\": \"US\",\n  \"timezone\": \"America/Los_Angeles\",\n  \"currency\": \"USD\",\n  \"subscription_status\": \"trial\",\n  \"max_users\": 10\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/organizations",
@@ -774,7 +1060,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Updated Company Name\",\n  \"description\": \"Updated description\",\n  \"website\": \"https://updated.com\"\n}"
+							"raw": "{\n  \"name\": \"Updated Company Name\",\n  \"description\": \"Updated description\",\n  \"email\": \"info@updated.com\",\n  \"phone\": \"+1-555-0200\",\n  \"website\": \"https://updated.com\",\n  \"address\": \"456 Updated Avenue\",\n  \"city\": \"New York\",\n  \"state\": \"New York\",\n  \"postal_code\": \"10001\",\n  \"country\": \"US\",\n  \"timezone\": \"America/New_York\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/organizations/:id",
@@ -869,12 +1155,12 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user_id\": 5,\n  \"role_ids\": [2, 3]\n}"
+							"raw": "{\n  \"user_id\": \"user-uuid-here\",\n  \"role\": \"member\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/organizations/:id/users",
+							"raw": "{{base_url}}/organizations/:id/add-user",
 							"host": ["{{base_url}}"],
-							"path": ["organizations", ":id", "users"],
+							"path": ["organizations", ":id", "add-user"],
 							"variable": [
 								{
 									"key": "id",
@@ -882,7 +1168,236 @@
 								}
 							]
 						},
-						"description": "Add existing user to organization with roles"
+						"description": "Add existing user to organization by user ID with optional role (default: member)"
+					},
+					"response": []
+				},
+				{
+					"name": "Invite User to Organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Organization-ID",
+								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"superadmin@lavalite.org\",\n  \"role\": \"member\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/:id/invite-user",
+							"host": ["{{base_url}}"],
+							"path": ["organizations", ":id", "invite-user"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{current_organization_id}}"
+								}
+							]
+						},
+						"description": "Invite user to organization by email or user_id. If user exists, adds them directly. If not, sends invitation email. Role defaults to 'member'."
+					},
+					"response": []
+				},
+				{
+					"name": "Remove User from Organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Organization-ID",
+								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user-uuid-here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/:id/remove-user",
+							"host": ["{{base_url}}"],
+							"path": ["organizations", ":id", "remove-user"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{current_organization_id}}"
+								}
+							]
+						},
+						"description": "Remove user from organization (detach only, doesn't delete user)"
+					},
+					"response": []
+				},
+				{
+					"name": "Detach User from Organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Organization-ID",
+								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user-uuid-here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/organizations/:id/detach-user",
+							"host": ["{{base_url}}"],
+							"path": ["organizations", ":id", "detach-user"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{current_organization_id}}"
+								}
+							]
+						},
+						"description": "Detach user from organization (alias for remove-user)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invitation Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invitations/:token",
+							"host": ["{{base_url}}"],
+							"path": ["invitations", ":token"],
+							"variable": [
+								{
+									"key": "token",
+									"value": "invitation-token-here"
+								}
+							]
+						},
+						"description": "Get invitation details as JSON (API endpoint)"
+					},
+					"response": []
+				},
+				{
+					"name": "View Invitation Landing Page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/invitations/:token",
+							"host": ["{{base_url}}"],
+							"path": ["invitations", ":token"],
+							"variable": [
+								{
+									"key": "token",
+									"value": "invitation-token-here"
+								}
+							]
+						},
+						"description": "View invitation in browser with accept/reject buttons (Web route). Users click this link from their email."
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invitations/:token/accept",
+							"host": ["{{base_url}}"],
+							"path": ["invitations", ":token", "accept"],
+							"variable": [
+								{
+									"key": "token",
+									"value": "invitation-token-here"
+								}
+							]
+						},
+						"description": "Accept organization invitation (public endpoint)"
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invitations/:token/reject",
+							"host": ["{{base_url}}"],
+							"path": ["invitations", ":token", "reject"],
+							"variable": [
+								{
+									"key": "token",
+									"value": "invitation-token-here"
+								}
+							]
+						},
+						"description": "Reject organization invitation (public endpoint)"
+					},
+					"response": []
+				},
+				{
+					"name": "My Pending Invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/invitations",
+							"host": ["{{base_url}}"],
+							"path": ["invitations"]
+						},
+						"description": "Get authenticated user's pending organization invitations"
 					},
 					"response": []
 				}
@@ -1113,7 +1628,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user_id\": 5,\n  \"role\": \"member\"\n}"
+							"raw": "{\n  \"user_id\": \"user-id-here\",\n  \"role\": \"member\"\n}"
 						},
 						"url": {
 							"raw": "{{base_url}}/teams/:id/members",
@@ -1126,7 +1641,67 @@
 								}
 							]
 						},
-						"description": "Add member to team (role: leader/member/viewer)"
+						"description": "Add existing organization member to team (user must already be in organization)"
+					},
+					"response": []
+				},
+				{
+					"name": "Invite Team Member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Organization-ID",
+								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"member@example.com\",\n  \"role\": \"member\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/teams/:id/invite-member",
+							"host": ["{{base_url}}"],
+							"path": ["teams", ":id", "invite-member"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Invite user to team by email or user_id. Sends invitation email if user doesn't exist or isn't in organization yet."
+					},
+					"response": []
+				},
+				{
+					"name": "My Team Invitations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/team-invitations",
+							"host": ["{{base_url}}"],
+							"path": ["team-invitations"]
+						},
+						"description": "Get authenticated user's pending team invitations"
 					},
 					"response": []
 				},
@@ -1326,9 +1901,70 @@
 								}
 							]
 						},
-						"description": "Get role with permissions and users"
+						"description": "Get comprehensive role details including:\n- Basic role information (id, name, slug, description)\n- is_global flag (true for system roles)\n- Permissions list with full details\n- Users assigned to this role (with pivot data: organization_id, created_at)\n- Organization details (if role is org-specific)\n- Modules associated with role\n- Counts: permissions_count, users_count, modules_count\n\nResponse includes all relationships and statistics needed for role details page."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Global Role Example",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/roles/1",
+									"host": ["{{base_url}}"],
+									"path": ["roles", "1"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Super Admin\",\n    \"slug\": \"superadmin\",\n    \"description\": \"System super administrator with full access\",\n    \"is_global\": true,\n    \"permissions_count\": 25,\n    \"users_count\": 3,\n    \"modules_count\": 5,\n    \"organization\": null,\n    \"permissions\": [\n      {\n        \"id\": 1,\n        \"name\": \"Manage Users\",\n        \"slug\": \"manage-users\",\n        \"description\": \"Create, update, delete users\"\n      },\n      {\n        \"id\": 2,\n        \"name\": \"Manage Roles\",\n        \"slug\": \"manage-roles\",\n        \"description\": \"Create, update, delete roles\"\n      },\n      {\n        \"id\": 3,\n        \"name\": \"Manage Organizations\",\n        \"slug\": \"manage-organizations\",\n        \"description\": \"Full organization management\"\n      }\n    ],\n    \"users\": [\n      {\n        \"id\": 1,\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"full_name\": \"John Doe\",\n        \"email\": \"john@lavalite.org\",\n        \"created_at\": \"2025-11-01T10:00:00.000000Z\",\n        \"pivot\": {\n          \"organization_id\": null,\n          \"created_at\": \"2025-11-01T10:05:00.000000Z\"\n        }\n      },\n      {\n        \"id\": 2,\n        \"first_name\": \"Jane\",\n        \"last_name\": \"Smith\",\n        \"full_name\": \"Jane Smith\",\n        \"email\": \"jane@lavalite.org\",\n        \"created_at\": \"2025-11-05T14:30:00.000000Z\",\n        \"pivot\": {\n          \"organization_id\": null,\n          \"created_at\": \"2025-11-05T14:35:00.000000Z\"\n        }\n      }\n    ],\n    \"modules\": [\n      {\n        \"id\": 1,\n        \"name\": \"User Management\",\n        \"slug\": \"user-management\"\n      },\n      {\n        \"id\": 2,\n        \"name\": \"Organization Management\",\n        \"slug\": \"organization-management\"\n      }\n    ]\n  }\n}"
+						},
+						{
+							"name": "Organization Role Example",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Organization-ID",
+										"value": "{{current_organization_id}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/roles/5",
+									"host": ["{{base_url}}"],
+									"path": ["roles", "5"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"data\": {\n    \"id\": 5,\n    \"name\": \"Team Lead\",\n    \"slug\": \"team-lead\",\n    \"description\": \"Team leader with project management access\",\n    \"is_global\": false,\n    \"permissions_count\": 12,\n    \"users_count\": 5,\n    \"modules_count\": 3,\n    \"organization\": {\n      \"id\": 1,\n      \"name\": \"Acme Corporation\",\n      \"slug\": \"acme-corp\",\n      \"email\": \"info@acme.com\"\n    },\n    \"permissions\": [\n      {\n        \"id\": 10,\n        \"name\": \"View Projects\",\n        \"slug\": \"view-projects\",\n        \"description\": \"View all projects in organization\"\n      },\n      {\n        \"id\": 11,\n        \"name\": \"Manage Team\",\n        \"slug\": \"manage-team\",\n        \"description\": \"Add/remove team members\"\n      },\n      {\n        \"id\": 12,\n        \"name\": \"Approve Timesheets\",\n        \"slug\": \"approve-timesheets\",\n        \"description\": \"Approve team member timesheets\"\n      }\n    ],\n    \"users\": [\n      {\n        \"id\": 10,\n        \"first_name\": \"Alice\",\n        \"last_name\": \"Johnson\",\n        \"full_name\": \"Alice Johnson\",\n        \"email\": \"alice@acme.com\",\n        \"created_at\": \"2025-10-15T09:00:00.000000Z\",\n        \"pivot\": {\n          \"organization_id\": 1,\n          \"created_at\": \"2025-10-15T09:30:00.000000Z\"\n        }\n      },\n      {\n        \"id\": 15,\n        \"first_name\": \"Bob\",\n        \"last_name\": \"Williams\",\n        \"full_name\": \"Bob Williams\",\n        \"email\": \"bob@acme.com\",\n        \"created_at\": \"2025-10-20T11:00:00.000000Z\",\n        \"pivot\": {\n          \"organization_id\": 1,\n          \"created_at\": \"2025-10-20T11:15:00.000000Z\"\n        }\n      }\n    ],\n    \"modules\": [\n      {\n        \"id\": 5,\n        \"name\": \"Project Management\",\n        \"slug\": \"project-management\"\n      },\n      {\n        \"id\": 6,\n        \"name\": \"Team Management\",\n        \"slug\": \"team-management\"\n      },\n      {\n        \"id\": 7,\n        \"name\": \"Timesheet\",\n        \"slug\": \"timesheet\"\n      }\n    ]\n  }\n}"
+						}
+					]
 				},
 				{
 					"name": "Update Role",
@@ -1470,14 +2106,100 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"user_id\": 5,\n  \"role_id\": 2\n}"
+							"raw": "{\n  \"user_id\": 5,\n  \"organization_id\": \"{{current_organization_id}}\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/roles/assign",
+							"raw": "{{base_url}}/roles/:role_id/assign-user",
 							"host": ["{{base_url}}"],
-							"path": ["roles", "assign"]
+							"path": ["roles", ":role_id", "assign-user"],
+							"variable": [
+								{
+									"key": "role_id",
+									"value": "2",
+									"description": "Role ID"
+								}
+							]
 						},
-						"description": "Assign role to user in organization"
+						"description": "Assign role to user in organization. The role ID is in the URL path, and user_id is in the request body. Organization ID can be passed in body or will be auto-detected from X-Organization-ID header."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "X-Organization-ID",
+										"value": "{{current_organization_id}}"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"user_id\": 5\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/roles/2/assign-user",
+									"host": ["{{base_url}}"],
+									"path": ["roles", "2", "assign-user"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"message\": \"Role assigned successfully\",\n  \"user\": {\n    \"id\": 5,\n    \"first_name\": \"Alice\",\n    \"last_name\": \"Johnson\",\n    \"full_name\": \"Alice Johnson\",\n    \"email\": \"alice@example.com\",\n    \"roles\": [\n      {\n        \"id\": 2,\n        \"name\": \"Manager\",\n        \"slug\": \"manager\",\n        \"description\": \"Organization manager role\",\n        \"is_global\": false,\n        \"pivot\": {\n          \"organization_id\": \"9d5c88e7-a1b2-4c3d-9e8f-123456789abc\",\n          \"created_at\": \"2025-11-22T10:00:00.000000Z\"\n        }\n      }\n    ]\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Role from User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Organization-ID",
+								"value": "{{current_organization_id}}"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": 5,\n  \"organization_id\": \"{{current_organization_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/:role_id/remove-user",
+							"host": ["{{base_url}}"],
+							"path": ["roles", ":role_id", "remove-user"],
+							"variable": [
+								{
+									"key": "role_id",
+									"value": "2",
+									"description": "Role ID"
+								}
+							]
+						},
+						"description": "Remove role from user in organization"
 					},
 					"response": []
 				}

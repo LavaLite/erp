@@ -28,7 +28,7 @@ class TwoFactorController extends Controller
      */
     public function enable(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user() ?? $request->user('web');
 
         if ($user->two_factor_enabled) {
             return response()->json([
@@ -82,7 +82,7 @@ class TwoFactorController extends Controller
             'code' => 'required|string|digits:6',
         ]);
 
-        $user = $request->user();
+        $user = $request->user() ?? $request->user('web');
 
         if ($user->two_factor_enabled) {
             return response()->json([
@@ -130,7 +130,7 @@ class TwoFactorController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = $request->user();
+        $user = $request->user() ?? $request->user('web');
 
         if (! $user->two_factor_enabled) {
             return response()->json([
@@ -213,7 +213,7 @@ class TwoFactorController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = $request->user();
+        $user = $request->user() ?? $request->user('web');
 
         if (! $user->two_factor_enabled) {
             return response()->json([

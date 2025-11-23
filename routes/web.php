@@ -38,6 +38,14 @@ Route::get('/auth/{provider}/callback', [\App\Http\Controllers\Web\SocialAuthCon
 Route::get('/verify-email', [EmailVerificationController::class, 'verifyViaGet'])
     ->name('verification.verify');
 
+// Organization invitation landing page
+Route::get('/invitations/{token}', [\App\Http\Controllers\Api\InvitationController::class, 'showLandingPage'])
+    ->name('invitation.show');
+
+// Team invitation landing page
+Route::get('/team-invitations/{token}', [\App\Http\Controllers\Api\TeamInvitationController::class, 'showLandingPage'])
+    ->name('team.invitation.show');
+
 // Email not verified page - accessible to authenticated users
 Route::get('/email-not-verified', function () {
     return view('auth.email-not-verified');
@@ -62,4 +70,21 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::get('/change-password', function () {
         return view('settings');
     })->name('password.change');
+
+    // 2FA Settings Routes (Session-based)
+    Route::prefix('settings/2fa')->group(function () {
+        Route::post('/enable', [\App\Http\Controllers\Api\TwoFactorController::class, 'enable']);
+        Route::post('/confirm', [\App\Http\Controllers\Api\TwoFactorController::class, 'confirm']);
+        Route::post('/disable', [\App\Http\Controllers\Api\TwoFactorController::class, 'disable']);
+        Route::post('/recovery-codes', [\App\Http\Controllers\Api\TwoFactorController::class, 'regenerateRecoveryCodes']);
+    });
 });
+
+// 2FA Challenge Routes
+Route::get('/two-factor-challenge', [\App\Http\Controllers\Web\TwoFactorChallengeController::class, 'create'])
+    ->middleware('guest')
+    ->name('2fa.challenge');
+
+Route::post('/two-factor-challenge', [\App\Http\Controllers\Web\TwoFactorChallengeController::class, 'store'])
+    ->middleware('guest')
+    ->name('2fa.challenge.store');

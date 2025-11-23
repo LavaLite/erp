@@ -99,7 +99,17 @@ class RoleController extends Controller
      */
     public function show(string $id)
     {
-        $role = Role::with('permissions', 'users')->findOrFail($id);
+        $role = Role::with([
+                'permissions',
+                'users' => function ($query) {
+                    $query->select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.created_at')
+                          ->withPivot('organization_id', 'created_at');
+                },
+                'organization',
+                'modules'
+            ])
+            ->withCount(['permissions', 'users', 'modules'])
+            ->findOrFail($id);
 
         return new RoleResource($role);
     }
@@ -203,22 +213,27 @@ class RoleController extends Controller
         $user = User::findOrFail($request->user_id);
         $organization = $organizationId ? Organization::findOrFail($organizationId) : null;
 
+        $currentUser = $request->user();
+
         // Only super admins can assign the superadmin role
-        if ($role->slug === 'superadmin' && ! $request->user()->isSuperAdmin()) {
+        if ($role->slug === 'superadmin' && ! $currentUser->isSuperAdmin()) {
             return response()->json([
                 'error' => __('messages.role.superadmin_only'),
             ], 403);
         }
 
-        // Only global admins can assign global roles (including global admin role)
-        if ($role->organization_id === 'global' && ! $request->user()->canManageGlobalRoles()) {
+        // Check if the role is global (organization_id is null or 'global')
+        $isGlobalRole = is_null($role->organization_id) || $role->organization_id === 'global';
+
+        // Only global admins or super admins can assign global roles
+        if ($isGlobalRole && ! $currentUser->canManageGlobalRoles()) {
             return response()->json([
                 'error' => __('messages.role.global_assign_only'),
             ], 403);
         }
 
-        // Verify role belongs to the tenant or is global
-        if ($organization && $role->organization_id !== $organization->id && $role->organization_id !== 'global') {
+        // For organization-specific roles, verify role belongs to the organization
+        if ($organization && ! $isGlobalRole && $role->organization_id !== $organization->id) {
             return response()->json([
                 'error' => __('messages.role.not_belong'),
             ], 400);
@@ -239,15 +254,21 @@ class RoleController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'organization_id' => 'required|uuid|exists:tenants,id',
+            'organization_id' => 'nullable|uuid|exists:organizations,id',
         ]);
 
         $role = Role::findOrFail($roleId);
         $user = User::findOrFail($request->user_id);
-        $organization = Organization::findOrFail($request->organization_id);
+        
+        // Get organization from request or header
+        $organizationId = $request->organization_id ?? $request->header('X-Organization-ID');
+        $organization = $organizationId ? Organization::findOrFail($organizationId) : null;
 
-        // Verify role belongs to the tenant
-        if ($role->organization_id !== $organization->id) {
+        // Check if the role is global (organization_id is null or 'global')
+        $isGlobalRole = is_null($role->organization_id) || $role->organization_id === 'global';
+
+        // For organization-specific roles, verify role belongs to the organization
+        if ($organization && !$isGlobalRole && $role->organization_id !== $organization->id) {
             return response()->json([
                 'error' => __('messages.role.not_belong'),
             ], 400);

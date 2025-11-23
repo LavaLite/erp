@@ -85,6 +85,9 @@
                 <button onclick="switchTab('password')" id="tab-password" class="tab-button px-6 py-2 rounded-lg text-sm font-medium transition-all">
                     {{ __('Password') }}
                 </button>
+                <button onclick="switchTab('2fa')" id="tab-2fa" class="tab-button px-6 py-2 rounded-lg text-sm font-medium transition-all">
+                    {{ __('Two Factor Auth') }}
+                </button>
             </div>
         </div>
 
@@ -383,6 +386,128 @@
                     </ul>
                 </div>
             </div>
+
+            <!-- 2FA Tab -->
+            <div id="content-2fa" class="tab-content hidden">
+                <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 shadow-2xl">
+                    <h3 class="text-xl font-display font-bold text-white mb-6">{{ __('Two Factor Authentication') }}</h3>
+
+                    <!-- Notification Container -->
+                    <div id="2fa-notification-container" class="hidden"></div>
+
+                    <!-- Status Indicator -->
+                    <div id="2fa-status-container" class="mb-8 p-4 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div id="2fa-status-icon" class="w-10 h-10 rounded-full flex items-center justify-center mr-4 bg-slate-700 text-slate-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 id="2fa-status-title" class="text-lg font-semibold text-white">{{ __('2FA is currently disabled') }}</h4>
+                                <p id="2fa-status-desc" class="text-sm text-slate-400">{{ __('Enable two-factor authentication to add an extra layer of security to your account.') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enable 2FA Section -->
+                    <div id="2fa-enable-section">
+                        <p class="text-slate-300 mb-6">
+                            {{ __('When two-factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone\'s Google Authenticator application.') }}
+                        </p>
+                        <button id="btn-enable-2fa" class="px-6 py-3 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 rounded-lg text-white font-semibold shadow-lg shadow-violet-500/50 transition-all">
+                            {{ __('Enable Two-Factor Authentication') }}
+                        </button>
+                    </div>
+
+                    <!-- Setup 2FA (QR Code) Section -->
+                    <div id="2fa-setup-section" class="hidden space-y-6">
+                        <div class="border-t border-white/10 pt-6">
+                            <h4 class="text-lg font-semibold text-white mb-4">{{ __('Finish enabling two-factor authentication.') }}</h4>
+                            <p class="text-slate-300 mb-4">
+                                {{ __('To finish enabling two-factor authentication, scan the following QR code using your phone\'s authenticator application or enter the setup key and provide the generated OTP code.') }}
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-8 items-start">
+                                <div class="bg-white p-4 rounded-lg" id="qr-code-container">
+                                    <!-- QR Code SVG will be injected here -->
+                                </div>
+                                <div class="flex-1 space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-400 mb-1">{{ __('Setup Key') }}</label>
+                                        <div class="flex items-center space-x-2">
+                                            <code id="setup-key" class="bg-black/30 px-3 py-2 rounded text-violet-300 font-mono text-sm"></code>
+                                            <button type="button" onclick="copyToClipboard('setup-key')" class="text-slate-400 hover:text-white">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <form id="2fa-confirm-form" class="space-y-4">
+                                        <div>
+                                            <label for="confirm-code" class="block text-sm font-medium text-slate-300 mb-2">{{ __('Code') }}</label>
+                                            <input id="confirm-code" name="code" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" required class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-slate-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all" placeholder="XXXXXX">
+                                        </div>
+                                        <div class="flex space-x-3">
+                                            <button type="submit" class="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white font-semibold transition-all">
+                                                {{ __('Confirm & Enable') }}
+                                            </button>
+                                            <button type="button" id="btn-cancel-setup" class="px-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-white font-semibold transition-all">
+                                                {{ __('Cancel') }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage 2FA Section (Active) -->
+                    <div id="2fa-manage-section" class="hidden space-y-6">
+                        <p class="text-slate-300">
+                            {{ __('Two-factor authentication is enabled. You may disable it or regenerate your recovery codes.') }}
+                        </p>
+
+                        <div class="border-t border-white/10 pt-6">
+                            <h4 class="text-lg font-semibold text-white mb-4">{{ __('Recovery Codes') }}</h4>
+                            <p class="text-slate-400 text-sm mb-4">
+                                {{ __('Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.') }}
+                            </p>
+                            
+                            <div id="recovery-codes-container" class="bg-black/30 p-4 rounded-lg grid grid-cols-2 gap-2 font-mono text-sm text-slate-300 mb-4">
+                                <!-- Codes injected here -->
+                            </div>
+
+                            <div class="flex flex-wrap gap-4">
+                                <button id="btn-regenerate-codes" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-white text-sm font-medium transition-all">
+                                    {{ __('Regenerate Recovery Codes') }}
+                                </button>
+                                <button id="btn-disable-2fa" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-lg text-red-400 text-sm font-medium transition-all">
+                                    {{ __('Disable 2FA') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Password Confirmation Modal -->
+                    <div id="password-confirm-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+                        <div class="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl mx-4">
+                            <h3 class="text-xl font-bold text-white mb-4" id="pwd-confirm-title">{{ __('Confirm Password') }}</h3>
+                            <p class="text-slate-400 mb-6" id="pwd-confirm-desc">{{ __('For your security, please confirm your password to continue.') }}</p>
+                            <form id="password-confirm-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-300 mb-2">{{ __('Password') }}</label>
+                                    <input type="password" id="confirm-action-password" required class="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:ring-2 focus:ring-violet-500">
+                                </div>
+                                <div class="flex space-x-3 justify-end">
+                                    <button type="button" onclick="closePasswordModal()" class="px-4 py-2 text-slate-300 hover:text-white">{{ __('Cancel') }}</button>
+                                    <button type="submit" class="px-6 py-2 bg-violet-600 hover:bg-violet-700 rounded-lg text-white font-semibold">{{ __('Confirm') }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -396,6 +521,39 @@
             // Show selected content
             document.getElementById('content-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('active');
+        }
+
+        // Notification System
+        function showNotification(message, type = 'success', containerId = '2fa-notification-container') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const bgColor = type === 'success' ? 'bg-emerald-500/10' : 'bg-red-500/10';
+            const borderColor = type === 'success' ? 'border-emerald-500/20' : 'border-red-500/20';
+            const textColor = type === 'success' ? 'text-emerald-300' : 'text-red-300';
+            const iconColor = type === 'success' ? 'text-emerald-400' : 'text-red-400';
+            
+            container.className = `mb-6 p-4 rounded-lg border ${bgColor} ${borderColor} flex items-center justify-between`;
+            container.innerHTML = `
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 ${iconColor} mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${type === 'success' 
+                            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'}
+                    </svg>
+                    <p class="text-sm ${textColor}">${message}</p>
+                </div>
+                <button onclick="this.parentElement.classList.add('hidden')" class="text-slate-400 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+            container.classList.remove('hidden');
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                }, 5000);
+            }
         }
 
         // Load user profile data
@@ -427,14 +585,12 @@
             submitButton.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
             
             const formData = new FormData(e.target);
-            const token = localStorage.getItem('auth_token');
             
             try {
-                const response = await fetch('/api/profile', {
+                const response = await fetch('/settings/profile', {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
-                        'Authorization': 'Bearer ' + token,
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Content-Type': 'application/json'
                     },
@@ -444,21 +600,19 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Update stored user data
                     if (data.user) {
                         localStorage.setItem('user_data', JSON.stringify(data.user));
                     }
-                    // Show success message
                     document.getElementById('profile-success').classList.remove('hidden');
                     setTimeout(() => {
                         document.getElementById('profile-success').classList.add('hidden');
                     }, 5000);
                 } else {
-                    alert(data.message || 'Failed to update profile');
+                    showNotification(data.message || 'Failed to update profile', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showNotification('An error occurred. Please try again.', 'error');
             } finally {
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalText;
@@ -475,14 +629,12 @@
             submitButton.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
             
             const formData = new FormData(e.target);
-            const token = localStorage.getItem('auth_token');
             
             try {
-                const response = await fetch('/api/profile/password', {
+                const response = await fetch('/settings/password', {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
-                        'Authorization': 'Bearer ' + token,
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Content-Type': 'application/json'
                     },
@@ -492,19 +644,17 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Show success message
                     document.getElementById('password-success').classList.remove('hidden');
-                    // Reset form
                     e.target.reset();
                     setTimeout(() => {
                         document.getElementById('password-success').classList.add('hidden');
                     }, 5000);
                 } else {
-                    alert(data.message || 'Failed to update password');
+                    showNotification(data.message || 'Failed to update password', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                showNotification('An error occurred. Please try again.', 'error');
             } finally {
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalText;
@@ -581,6 +731,206 @@
                 });
             }
         });
+
+        // 2FA Logic
+        let pendingAction = null;
+
+        function update2FAUI(enabled) {
+            const statusTitle = document.getElementById('2fa-status-title');
+            const statusDesc = document.getElementById('2fa-status-desc');
+            const statusIcon = document.getElementById('2fa-status-icon');
+            
+            if (enabled) {
+                statusTitle.textContent = '{{ __('2FA is currently enabled') }}';
+                statusDesc.textContent = '{{ __('Your account is secured with two-factor authentication.') }}';
+                statusIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center mr-4 bg-emerald-500/10 text-emerald-400';
+                
+                document.getElementById('2fa-enable-section').classList.add('hidden');
+                document.getElementById('2fa-setup-section').classList.add('hidden');
+                document.getElementById('2fa-manage-section').classList.remove('hidden');
+            } else {
+                statusTitle.textContent = '{{ __('2FA is currently disabled') }}';
+                statusDesc.textContent = '{{ __('Enable two-factor authentication to add an extra layer of security to your account.') }}';
+                statusIcon.className = 'w-10 h-10 rounded-full flex items-center justify-center mr-4 bg-slate-700 text-slate-400';
+                
+                document.getElementById('2fa-enable-section').classList.remove('hidden');
+                document.getElementById('2fa-setup-section').classList.add('hidden');
+                document.getElementById('2fa-manage-section').classList.add('hidden');
+            }
+        }
+
+        // Check initial status
+        document.addEventListener('DOMContentLoaded', function() {
+            const userData = localStorage.getItem('user_data');
+            if (userData) {
+                const user = JSON.parse(userData);
+                update2FAUI(user.two_factor_enabled);
+            }
+        });
+
+        // Enable 2FA Click
+        document.getElementById('btn-enable-2fa').addEventListener('click', async function() {
+            console.log('Enable 2FA button clicked');
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                console.log('CSRF Token:', csrfToken ? csrfToken.content : 'NOT FOUND');
+                
+                const response = await fetch('/settings/2fa/enable', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken ? csrfToken.content : '',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    // Show setup section
+                    document.getElementById('2fa-enable-section').classList.add('hidden');
+                    document.getElementById('2fa-setup-section').classList.remove('hidden');
+                    
+                    // Display QR Code
+                    document.getElementById('qr-code-container').innerHTML = data.qr_code_svg;
+                    document.getElementById('setup-key').textContent = data.secret;
+                    showNotification(data.message || 'Please scan the QR code with your authenticator app', 'success');
+                } else {
+                    showNotification(data.error || 'Failed to enable 2FA', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred: ' + error.message, 'error');
+            }
+        });
+
+        // Cancel Setup
+        document.getElementById('btn-cancel-setup').addEventListener('click', function() {
+            document.getElementById('2fa-setup-section').classList.add('hidden');
+            document.getElementById('2fa-enable-section').classList.remove('hidden');
+        });
+
+        // Confirm 2FA
+        document.getElementById('2fa-confirm-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const code = document.getElementById('confirm-code').value;
+            
+            try {
+                const response = await fetch('/settings/2fa/confirm', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update local storage
+                    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+                    userData.two_factor_enabled = true;
+                    localStorage.setItem('user_data', JSON.stringify(userData));
+                    
+                    update2FAUI(true);
+                    
+                    // Show recovery codes
+                    if (data.recovery_codes) {
+                        const container = document.getElementById('recovery-codes-container');
+                        container.innerHTML = data.recovery_codes.map(code => `<div>${code}</div>`).join('');
+                        showNotification('{{ __('Two-factor authentication enabled! Please save your recovery codes.') }}', 'success');
+                    }
+                } else {
+                    showNotification(data.error || 'Invalid code', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            }
+        });
+
+        // Disable 2FA Click
+        document.getElementById('btn-disable-2fa').addEventListener('click', function() {
+            pendingAction = 'disable';
+            document.getElementById('pwd-confirm-title').textContent = '{{ __('Disable Two-Factor Authentication') }}';
+            document.getElementById('pwd-confirm-desc').textContent = '{{ __('Please confirm your password to disable two-factor authentication.') }}';
+            document.getElementById('password-confirm-modal').classList.remove('hidden');
+        });
+
+        // Regenerate Codes Click
+        document.getElementById('btn-regenerate-codes').addEventListener('click', function() {
+            pendingAction = 'regenerate';
+            document.getElementById('pwd-confirm-title').textContent = '{{ __('Regenerate Recovery Codes') }}';
+            document.getElementById('pwd-confirm-desc').textContent = '{{ __('Please confirm your password to regenerate recovery codes.') }}';
+            document.getElementById('password-confirm-modal').classList.remove('hidden');
+        });
+
+        function closePasswordModal() {
+            document.getElementById('password-confirm-modal').classList.add('hidden');
+            document.getElementById('confirm-action-password').value = '';
+            pendingAction = null;
+        }
+
+        // Password Confirmation Submit
+        document.getElementById('password-confirm-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const password = document.getElementById('confirm-action-password').value;
+            
+            if (!pendingAction) return;
+
+            const currentAction = pendingAction; // Capture current action
+            const endpoint = currentAction === 'disable' ? '/settings/2fa/disable' : '/settings/2fa/recovery-codes';
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    closePasswordModal();
+                    
+                    if (currentAction === 'disable') {
+                        const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+                        userData.two_factor_enabled = false;
+                        localStorage.setItem('user_data', JSON.stringify(userData));
+                        update2FAUI(false);
+                        showNotification('{{ __('Two-factor authentication disabled.') }}', 'success');
+                    } else {
+                        // Show new recovery codes
+                        if (data.recovery_codes) {
+                            const container = document.getElementById('recovery-codes-container');
+                            container.innerHTML = data.recovery_codes.map(code => `<div>${code}</div>`).join('');
+                            showNotification('{{ __('Recovery codes regenerated.') }}', 'success');
+                        }
+                    }
+                } else {
+                    showNotification(data.error || 'Action failed', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            }
+        });
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('{{ __('Copied to clipboard!') }}', 'success');
+            });
+        }
     </script>
 
     <style>

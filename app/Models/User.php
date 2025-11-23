@@ -186,7 +186,13 @@ class User extends Authenticatable implements JWTSubject
      */
     public function isSuperAdmin(): bool
     {
-        return $this->is_super_admin === true;
+        // Check database flag first
+        if ($this->is_super_admin === true) {
+            return true;
+        }
+
+        // Also check if user has the superadmin role
+        return $this->roles()->where('slug', 'superadmin')->exists();
     }
 
     /**

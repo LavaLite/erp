@@ -13,6 +13,13 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        // If already authenticated, logout first to ensure clean state
+        if (Auth::guard('web')->check()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
+        
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -21,7 +28,22 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $remember = $request->filled('remember');
 
-        if (Auth::guard('web')->attempt($credentials, $remember)) {
+        // Validate credentials WITHOUT logging in yet
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+        
+        if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
+            // Check if 2FA is enabled - store session data but DON'T log in yet
+            if ($user->two_factor_enabled) {
+                $request->session()->put([
+                    'login.id' => $user->id,
+                    'login.remember' => $remember,
+                ]);
+                $request->session()->save(); // Force save session
+
+                return redirect()->route('2fa.challenge');
+            }
+            // Normal login - only now we actually log the user in
+            Auth::guard('web')->login($user, $remember);
             $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'));
@@ -39,9 +61,12 @@ class AuthController extends Controller
     {
         Auth::guard('web')->logout();
 
+        // Clear any 2FA session data
+        $request->session()->forget(['login.id', 'login.remember']);
+        
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
+        
         return redirect()->route('login');
     }
 }

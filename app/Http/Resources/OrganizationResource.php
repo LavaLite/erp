@@ -20,8 +20,33 @@ class OrganizationResource extends JsonResource
             'slug' => $this->slug,
             'domain' => $this->domain,
             'description' => $this->description,
+            
+            // Contact Information
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'website' => $this->website,
+            
+            // Address Information
+            'address' => $this->address,
+            'city' => $this->city,
+            'state' => $this->state,
+            'postal_code' => $this->postal_code,
+            
+            // Regional Settings
+            'country' => $this->country,
+            'timezone' => $this->timezone,
+            'currency' => $this->currency,
+            
+            // Settings & Status
             'settings' => $this->settings,
             'is_active' => $this->is_active,
+            
+            // Subscription Information
+            'subscription_status' => $this->subscription_status,
+            'max_users' => $this->max_users,
+            'trial_ends_at' => $this->trial_ends_at,
+            
+            // Timestamps
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
